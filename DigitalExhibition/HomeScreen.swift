@@ -10,8 +10,11 @@ import SwiftUI
 
 struct HomeScreen: View {
     var body: some View {
-        Text("HOME SCREEN, VIDEOS and CIRCLE OF EMOTION THING")
-        .navigationBarBackButtonHidden(true)
+        //NavigationView {
+            Text("HOME SCREEN, VIDEOS and CIRCLE OF EMOTION THING")
+            
+                .navigationBarBackButtonHidden(true)
+        //}
     }
 }
 
