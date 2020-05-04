@@ -9,22 +9,35 @@
 import SwiftUI
 
 struct SplashScreen: View {
+    @State var canExplore = false
     var body: some View {
-            NavigationView {
-                VStack {
-                    Text("Welcome to the Langtang Heritage Trail")
-                        .font(.largeTitle)
-                    NavigationLink(destination: SurveyScreen())
-                    {
-                        Text("EXPLORE")
-                        .padding()
-                            .font(.title)
-                    }
-                }
+        return Group {
+            if canExplore {
+                SurveyScreen()
             }
-        .navigationViewStyle(StackNavigationViewStyle())
-        .padding()
+            else {
+                Welcome(canExplore: $canExplore)
+            }
+        }
+    }
+}
 
+struct Welcome: View {
+    @Binding var canExplore: Bool
+    var body: some View {
+        VStack {
+            Text("Welcome to the Langtang Heritage Trail")
+                .font(.largeTitle)
+            Button(action: {
+                if (self.canExplore == false)
+                {
+                    self.canExplore = true
+                }
+            }) {
+                Text("EXPLORE")
+                    .font(.title)
+            }
+        }
     }
 }
 
