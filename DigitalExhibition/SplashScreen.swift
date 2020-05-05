@@ -55,14 +55,14 @@ struct Welcome: View {
                 }) {
                     Text("EXPLORE")
                         .font(.title)
-                        .fontWeight(.semibold)
+                        .fontWeight(.medium)
                         .foregroundColor(Color.white)
                         .multilineTextAlignment(.center)
                     
                 }
                 .padding(.all, 5)
-                .border(Color(red: 109/255.0, green: 76/255.0, blue: 65/255.0, opacity: 0.5), width: 2)
-                .background(Color(red: 109/255.0, green: 76/255.0, blue: 65/255.0, opacity: 1.0))
+                .border(Color(red: 0/255.0, green: 131/255.0, blue: 143/255.0, opacity: 0.5), width: 2)
+                .background(Color(red: 0/255.0, green: 131/255.0, blue: 143/255.0, opacity: 1.0))
                 .cornerRadius(5.0)
             }
         }
