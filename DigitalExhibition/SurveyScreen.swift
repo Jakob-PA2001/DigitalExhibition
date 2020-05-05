@@ -106,6 +106,7 @@ struct Survey: View {
                         .foregroundColor(Color.blue)
                     
                 }
+                
             }
             Spacer()
         }
