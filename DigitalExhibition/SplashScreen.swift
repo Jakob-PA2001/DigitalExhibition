@@ -26,16 +26,44 @@ struct Welcome: View {
     @Binding var canExplore: Bool
     var body: some View {
         VStack {
-            Text("Welcome to the Langtang Heritage Trail")
-                .font(.largeTitle)
-            Button(action: {
-                if (self.canExplore == false)
-                {
-                    self.canExplore = true
+            HStack {
+                Image("Fire_Logo")
+                    .font(.subheadline)
+                    .multilineTextAlignment(.leading)
+                    .padding()
+                Spacer()
+                Image("WSU_Logo")
+                    .font(.subheadline)
+                    .multilineTextAlignment(.trailing)
+                    .padding()
+            }
+            .padding(.top, -620)
+            .offset(y: 250)
+            Image("Splash")
+                .resizable()
+                .padding(.top, -620)
+                .offset(y: 360)
+                .aspectRatio(contentMode: .fit)
+            VStack {
+                Text("Welcome to the Langtang Heritage Trail")
+                    .font(.largeTitle)
+                Button(action: {
+                    if (self.canExplore == false)
+                    {
+                        self.canExplore = true
+                    }
+                }) {
+                    Text("EXPLORE")
+                        .font(.title)
+                        .fontWeight(.semibold)
+                        .foregroundColor(Color.white)
+                        .multilineTextAlignment(.center)
+                    
                 }
-            }) {
-                Text("EXPLORE")
-                    .font(.title)
+                .padding(.all, 5)
+                .border(Color(red: 109/255.0, green: 76/255.0, blue: 65/255.0, opacity: 0.5), width: 2)
+                .background(Color(red: 109/255.0, green: 76/255.0, blue: 65/255.0, opacity: 1.0))
+                .cornerRadius(5.0)
             }
         }
     }
