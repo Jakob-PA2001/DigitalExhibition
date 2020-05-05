@@ -1,6 +1,6 @@
 # DigitalExhibition
 ##
-The very 1st screeen is splash screen.
+The very 1st screen is splash screen.
 
 ## Login page info
 
