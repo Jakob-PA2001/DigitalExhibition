@@ -2,7 +2,7 @@
 ##
 The very 1st screen is splash screen.
 
-## Login page info
+## Login page dummy data info
 
 Username: Admin
 
