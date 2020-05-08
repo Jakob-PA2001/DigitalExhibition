@@ -94,6 +94,35 @@ struct LoginForm: View {
                     HStack {
                         Spacer()
                         Button(action: {
+                            /*let url = URL(string: "https://pa2001.cdms.westernsydney.edu.au/user.php")
+                            
+                            var request = URLRequest(url: url!)
+                            request.httpMethod = "POST"
+                            
+                            var dataString = "secretWord=pa2001" // starting POST string with a secretWord
+                            
+                            // the POST string
+
+                            dataString = dataString + "&a=\(self.username)" // replace "username.txt with own declared variable.
+                            dataString = dataString + "&b=\(self.password)" // replace "password.txt with own declared variable.
+                            
+                            // convert POST string to utf8 format
+                            
+                            let dataD = dataString.data(using: .utf8) // convert to utf8 string
+                            
+                            do
+                            {
+                            
+                                // EXECUTE POST REQUEST
+
+                                let uploadJob = URLSession.shared.uploadTask(with: request, from: dataD)
+                                {
+                                    data, response, error in
+                                    
+                                   
+                                }
+                                uploadJob.resume()
+                            }*/
                             if (self.username == self.dummy_user &&
                                 self.password == self.dummy_pass) {
                                 self.canSignIn = true
@@ -114,6 +143,7 @@ struct LoginForm: View {
             }
             Spacer()
         }
+        
     }
 }
 struct LogIn_Previews: PreviewProvider {
