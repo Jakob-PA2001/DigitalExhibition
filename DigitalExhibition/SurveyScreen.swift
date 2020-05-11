@@ -75,19 +75,19 @@ struct Survey: View {
             }
             VStack(alignment: .leading) {
                 Section {
-                    Text("Gender")
-                        .font(.headline)
-                    TextField("Male or Female", text: self.$gender)
-                        .padding(.all)
-                        .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 0.5))
-                }
-                .padding()
-                Section {
                     Text("Age")
                         .font(.headline)
                     TextField("19, 20, 26..", text: self.$age)
                         .padding(.all)
                         .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                }
+                .padding()
+                Section {
+                    Text("Gender")
+                        .font(.headline)
+                    TextField("Male or Female", text: self.$gender)
+                        .padding(.all)
+                        .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 0.5))
                 }
                 .padding()
                 Section {
@@ -101,37 +101,13 @@ struct Survey: View {
             }
             Section {
                 Button(action: {
-                    let url = URL(string: "https://pa2001.cdms.westernsydney.edu.au/addsurvey.php")
-                    
-                    var request = URLRequest(url: url!)
-                    request.httpMethod = "POST"
-                    
-                    var dataString = "secretWord=pa2001" // starting POST string with a secretWord
-                    // the POST string
-
-                    dataString = dataString + "&a=\(self.gender)" // replace "username.txt with own declared variable.
-                    dataString = dataString + "&b=\(self.age)" // replace "password.txt with own declared variable.
-                    dataString = dataString + "&c=\(self.nationality)" // replace "password.txt with own declared variable.
-                    
-                    // convert POST string to utf8 format
-                    
-                    let dataD = dataString.data(using: .utf8) // convert to utf8 string
-                    
-                    do
-                    {
-                    
-                        // EXECUTE POST REQUEST
-
-                        let uploadJob = URLSession.shared.uploadTask(with: request, from: dataD)
-                        {
-                            data, response, error in
-                            
-                           
-                        }
-                        uploadJob.resume()
-                    }
+                    //self.debugging()
+                    //self.deleteALLSurveyData()
+                    self.save()
+                    //self.submitSurvey()
                     if (self.completed == false) {
                         self.completed = true
+                        //self.retrieve()
                     }
                 }) {
                     Text("Submit")
@@ -143,9 +119,66 @@ struct Survey: View {
                 
             }
             Spacer()
-            
         }
         
+    }
+    
+    func debugging() {
+        let db = DBManager()
+        _ = db.getNewId()
+    }
+    
+    
+    func deleteALLSurveyData() {
+        let db = DBManager()
+        db.deleteAll()
+    }
+    
+    func retrieve(/*sender: AnyObject*/) {
+        let db = DBManager()
+        //var yolo: [String]
+        
+        let yolo = db.retrieveRows()
+        for counter in 0...(yolo.count - 1)  {
+            print(yolo[counter])
+        }
+    }
+    
+    func save(/*sender: AnyObject*/) {
+        let db = DBManager()
+        db.addRow(gender: self.gender, age: self.age, nationality: self.nationality)
+    } // assume 2 TextViews: id & name
+
+    func submitSurvey() {
+        let url = URL(string: "https://pa2001.cdms.westernsydney.edu.au/addsurvey.php")
+        
+        var request = URLRequest(url: url!)
+        request.httpMethod = "POST"
+        
+        var dataString = "secretWord=pa2001" // starting POST string with a secretWord
+        // the POST string
+
+        dataString = dataString + "&a=\(self.gender)" // replace "username.txt with own declared variable.
+        dataString = dataString + "&b=\(self.age)" // replace "password.txt with own declared variable.
+        dataString = dataString + "&c=\(self.nationality)" // replace "password.txt with own declared variable.
+        
+        // convert POST string to utf8 format
+        
+        let dataD = dataString.data(using: .utf8) // convert to utf8 string
+        
+        do
+        {
+        
+            // EXECUTE POST REQUEST
+
+            let uploadJob = URLSession.shared.uploadTask(with: request, from: dataD)
+            {
+                data, response, error in
+                
+               
+            }
+            uploadJob.resume()
+        }
     }
 }
 
