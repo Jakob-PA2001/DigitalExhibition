@@ -20,6 +20,8 @@
 		848C7A83245955A0000C4017 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 848C7A81245955A0000C4017 /* LaunchScreen.storyboard */; };
 		848C7A8E245955A0000C4017 /* DigitalExhibitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848C7A8D245955A0000C4017 /* DigitalExhibitionTests.swift */; };
 		848C7A99245955A0000C4017 /* DigitalExhibitionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848C7A98245955A0000C4017 /* DigitalExhibitionUITests.swift */; };
+		84FBE6AF2469031000F7DDFC /* DigitalExhibition.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 84FBE6AD2469031000F7DDFC /* DigitalExhibition.xcdatamodeld */; };
+		84FBE6B12469054B00F7DDFC /* DBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FBE6B02469054B00F7DDFC /* DBManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +61,8 @@
 		848C7A94245955A0000C4017 /* DigitalExhibitionUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DigitalExhibitionUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		848C7A98245955A0000C4017 /* DigitalExhibitionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DigitalExhibitionUITests.swift; sourceTree = "<group>"; };
 		848C7A9A245955A0000C4017 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		84FBE6AE2469031000F7DDFC /* DigitalExhibition.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DigitalExhibition.xcdatamodel; sourceTree = "<group>"; };
+		84FBE6B02469054B00F7DDFC /* DBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +114,8 @@
 			isa = PBXGroup;
 			children = (
 				848C7A762459559E000C4017 /* AppDelegate.swift */,
+				84FBE6AD2469031000F7DDFC /* DigitalExhibition.xcdatamodeld */,
+				84FBE6B02469054B00F7DDFC /* DBManager.swift */,
 				848C7A782459559E000C4017 /* SceneDelegate.swift */,
 				848C7A7A2459559E000C4017 /* ContentView.swift */,
 				841EC9C9245FF842007D6D3D /* SplashScreen.swift */,
@@ -287,7 +293,9 @@
 				841EC9CE245FF8A7007D6D3D /* HomeScreen.swift in Sources */,
 				841EC9D02460027E007D6D3D /* LogIn.swift in Sources */,
 				842219A9246148440079241B /* VideoGallery.swift in Sources */,
+				84FBE6B12469054B00F7DDFC /* DBManager.swift in Sources */,
 				848C7A792459559E000C4017 /* SceneDelegate.swift in Sources */,
+				84FBE6AF2469031000F7DDFC /* DigitalExhibition.xcdatamodeld in Sources */,
 				848C7A7B2459559E000C4017 /* ContentView.swift in Sources */,
 				841EC9CC245FF86E007D6D3D /* SurveyScreen.swift in Sources */,
 			);
@@ -614,6 +622,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		84FBE6AD2469031000F7DDFC /* DigitalExhibition.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				84FBE6AE2469031000F7DDFC /* DigitalExhibition.xcdatamodel */,
+			);
+			currentVersion = 84FBE6AE2469031000F7DDFC /* DigitalExhibition.xcdatamodel */;
+			path = DigitalExhibition.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 848C7A6B2459559E000C4017 /* Project object */;
 }
