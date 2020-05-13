@@ -106,8 +106,8 @@ struct Survey: View {
                     self.save()
                     //self.submitSurvey()
                     if (self.completed == false) {
-                        self.completed = true
-                        //self.retrieve()
+                        //self.completed = true
+                        self.retrieve()
                     }
                 }) {
                     Text("Submit")

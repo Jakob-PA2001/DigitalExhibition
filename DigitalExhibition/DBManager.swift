@@ -48,7 +48,7 @@ class DBManager: NSObject {
         let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Surveys")
         do {
             let searchQuery = "S-1"
-            fetchRequest.predicate = NSPredicate(format: "id == %@", searchQuery)
+            fetchRequest.predicate = NSPredicate(format: "sid == %@", searchQuery)
             products  = try managedContext.fetch(fetchRequest)
         }
         catch let error as NSError{
@@ -100,7 +100,7 @@ class DBManager: NSObject {
         var msg : [String] = []
         print(products.count)
         for product in products {
-                msg.append((product.value(forKeyPath: "id") as? String)!)
+                msg.append((product.value(forKeyPath: "sid") as? String)!)
                 msg.append((product.value(forKeyPath: "age") as? String)!)
                 msg.append((product.value(forKeyPath: "gender") as? String)!)
                 msg.append((product.value(forKeyPath: "nationality") as? String)!)
