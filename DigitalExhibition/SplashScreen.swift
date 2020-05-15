@@ -25,6 +25,7 @@ struct SplashScreen: View {
 struct Welcome: View {
     @Binding var canExplore: Bool
     var body: some View {
+        NavigationView {
         VStack {
             HStack {
                 Image("Fire_Logo")
@@ -66,6 +67,8 @@ struct Welcome: View {
                 .cornerRadius(5.0)
             }
         }
+        }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
