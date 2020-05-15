@@ -9,6 +9,25 @@
 import SwiftUI
 
 struct VideoGallery: View {
+    
+    @State private var logout: Bool = false
+    
+    var body: some View {
+        return Group {
+            if(logout) {
+                SplashScreen()
+            }
+            else {
+                Menu(logout: $logout)
+            }
+        }
+    }// End Body
+}
+
+struct Menu: View {
+    
+    @Binding var logout: Bool
+    
     var body: some View {
         NavigationView {
             VStack {
@@ -21,7 +40,7 @@ struct VideoGallery: View {
                     Image(systemName: "person.crop.circle.fill")
                         .font(.title)
                         .offset(y: -10)
-                    Text("Username")
+                    Text("Admin")
                         .font(.headline)
                         .offset(y: -10)
                 }// End HStack
@@ -42,28 +61,28 @@ struct VideoGallery: View {
                             Image(systemName: "person.3")
                         }
                     }
+                    NavigationLink(destination: SurveyManagement()) {
+                        HStack {
+                            Text("Survey Management")
+                            Spacer()
+                            Image(systemName: "doc.text")
+                        }
+                    }
+                    Button(action: {
+                        if(self.logout == false) {
+                            self.logout = true
+                        }
+                    }) {
+                        HStack {
+                            Text("Logout")
+                            Spacer()
+                            Image(systemName: "escape")
+                        }
+                    }
                 }// End List
-                
             }//End Vstack
-            
-            /*NavigationLink(destination: Videos()) {
-                Text("Video Gallery")
-            }*/
-            //.navigationBarTitle("The back")
-            /*.navigationBarItems(trailing:
-                HStack {
-                    Button("About") {
-                        print("About tapped!")
-                    }
-
-                    Button("Logout") {
-                        print("Help tapped!")
-                    }
-                }
-            )*/
-            
         }// End NavigationView
-    }// End Body
+    }
 }
 
 struct Videos: View {
@@ -75,6 +94,12 @@ struct Videos: View {
 struct UserManagement: View {
     var body: some View {
         Text("User Management")
+    }
+}
+
+struct SurveyManagement: View {
+    var body: some View {
+        Text("Survey Management")
     }
 }
 
