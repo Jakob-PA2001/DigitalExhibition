@@ -10,6 +10,7 @@ import SwiftUI
 
 struct SurveyScreen: View {
     
+    //Returns back to splashscreen if survey is open for 2 minutes.
     @State var maxTime = 120
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
@@ -47,6 +48,7 @@ struct SurveyScreen: View {
 }
 
 struct Survey: View {
+    //@Environment(\.presentationMode) var presentationMode
     
     @Binding var completed: Bool
     @Binding var login: Bool
@@ -58,6 +60,16 @@ struct Survey: View {
     var body: some View {
         VStack {
             HStack {
+                /*Button(action: {
+                    self.presentationMode.wrappedValue.dismiss()
+                }) {
+                    VStack {
+                        Text("Return")
+                        Image(systemName: "arrow.down")
+                        .font(.title)
+                    }
+                    .padding()
+                }.padding(.bottom, 50)*/
                 Spacer()
                 Button(action: {
                     if (self.login == false) {
@@ -100,21 +112,32 @@ struct Survey: View {
                 .padding()
             }
             Section {
-                Button(action: {
-                    //self.debugging()
-                    //self.deleteALLSurveyData()
-                    self.save()
-                    //self.submitSurvey()
-                    if (self.completed == false) {
-                        //self.completed = true
-                        self.retrieve()
-                    }
-                }) {
-                    Text("Submit")
-                        .font(.title)
-                        .foregroundColor(Color.blue)
-                    
-                }
+                HStack {
+                    Button(action: {
+                        self.age = ""
+                        self.gender = ""
+                        self.nationality = ""
+                    }) {
+                        Text("Clear")
+                            .font(.title)
+                        
+                    }// End Button
+                    .padding()
+                    Button(action: {
+                        //self.debugging()
+                        //self.deleteALLSurveyData()
+                        //self.save()
+                        //self.submitSurvey()
+                        if (self.completed == false) {
+                            self.completed = true
+                            self.retrieve()                    }
+                    }) {
+                        Text("Submit")
+                            .font(.title)
+                        
+                    }// End Button
+                    .padding()
+                }//End HStack
                 
                 
             }
@@ -124,18 +147,18 @@ struct Survey: View {
     }
     
     func debugging() {
-        let db = DBManager()
+        let db = SurveyDBManager()
         _ = db.getNewId()
     }
     
     
     func deleteALLSurveyData() {
-        let db = DBManager()
+        let db = SurveyDBManager()
         db.deleteAll()
     }
     
     func retrieve(/*sender: AnyObject*/) {
-        let db = DBManager()
+        let db = SurveyDBManager()
         //var yolo: [String]
         
         let yolo = db.retrieveRows()
@@ -145,7 +168,7 @@ struct Survey: View {
     }
     
     func save(/*sender: AnyObject*/) {
-        let db = DBManager()
+        let db = SurveyDBManager()
         db.addRow(gender: self.gender, age: self.age, nationality: self.nationality)
     } // assume 2 TextViews: id & name
 

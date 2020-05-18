@@ -8,6 +8,8 @@
 
 import SwiftUI
 
+//Testing purposes
+
 struct TestScreen: View {
     
     @State private var logout: Bool = false

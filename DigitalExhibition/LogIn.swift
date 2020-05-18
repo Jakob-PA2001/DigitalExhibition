@@ -7,13 +7,19 @@
 //
 
 import SwiftUI
+import UIKit
+import Foundation
+import SQLite3
 
 struct LogIn: View {
     
+
+
     @State var goBack = false
     @State var canSignIn = false
     @State var displayError = false
     
+
     var body: some View {
         return Group {
             if canSignIn {
@@ -28,9 +34,9 @@ struct LogIn: View {
         }
     }
 }
-
+    var errormessage = ""
 struct LoginForm: View {
-    
+
     @Binding var goBack: Bool
     @Binding var canSignIn: Bool
     @Binding var displayError: Bool
@@ -42,7 +48,9 @@ struct LoginForm: View {
     @State var dummy_pass = "PA2001"
         
     var body: some View {
+        
         VStack {
+            
             HStack {
                 Button(action: {
                     if (self.goBack == false) {
@@ -67,7 +75,7 @@ struct LoginForm: View {
             Section {
                 HStack {
                     if( self.displayError == true) {
-                        Text("Username or password is incorrect, please try again.")
+                        Text(errormessage)
                             .font(.headline)
                             .foregroundColor(Color.red)
                     }
@@ -94,35 +102,34 @@ struct LoginForm: View {
                     HStack {
                         Spacer()
                         Button(action: {
-                            /*let url = URL(string: "https://pa2001.cdms.westernsydney.edu.au/user.php")
-                            
-                            var request = URLRequest(url: url!)
-                            request.httpMethod = "POST"
-                            
-                            var dataString = "secretWord=pa2001" // starting POST string with a secretWord
-                            
-                            // the POST string
+                            databaseCreate()
+                                                    
+                        
+                          //  addusers()
+                            self.displayError = false
+                            if (showuserDatabase()==false){
+                                print("Database is empty")
+                                errormessage = "Syncing ,user database empty, please try again in a few moments!"
+                                syncUserzDatabase()
+                                self.displayError = true
+                            }else{
 
-                            dataString = dataString + "&a=\(self.username)" // replace "username.txt with own declared variable.
-                            dataString = dataString + "&b=\(self.password)" // replace "password.txt with own declared variable.
-                            
-                            // convert POST string to utf8 format
-                            
-                            let dataD = dataString.data(using: .utf8) // convert to utf8 string
-                            
-                            do
-                            {
-                            
-                                // EXECUTE POST REQUEST
+                               // getTableSize(tablename: "users")
+                                if (authenticate(USERNAME: self.username, PASSWORD: self.password) == true ){
 
-                                let uploadJob = URLSession.shared.uploadTask(with: request, from: dataD)
-                                {
-                                    data, response, error in
+
+                                    addvideos()
                                     
-                                   
+                                   self.canSignIn = true
+                                  
+                                }else{
+                                    errormessage = "Incorrect Username/Password"
                                 }
-                                uploadJob.resume()
-                            }*/
+                                  self.displayError = true
+                            }
+                          
+                            print(self.username)
+                            /*
                             if (self.username == self.dummy_user &&
                                 self.password == self.dummy_pass) {
                                 self.canSignIn = true
@@ -132,10 +139,15 @@ struct LoginForm: View {
                                 self.canSignIn = false
                                 self.displayError = true
                             }
+                            */
+                            
+                            
+                           
+                            
                         }) {
                             Text("Sign in")
                                 .font(.title)
-                        }
+                        }  //end of button funct
                         Spacer()
                     }
                 }
@@ -146,8 +158,157 @@ struct LoginForm: View {
         
     }
 }
+
+
+
+
+
+
 struct LogIn_Previews: PreviewProvider {
     static var previews: some View {
         LogIn()
     }
 }
+
+
+//DATABASE ADMIN USER FUNCTIONS
+
+func syncUserzDatabase(){
+            //Sync server user database --> local user database
+       
+            //allow abb load -> info.plist
+            print("===================")
+            // Do any additional setup after loading the view, typically from a nib.
+                   
+                   
+                   //created NSURL
+            let requestURL = Foundation.URL(string: URL_GET_USERS)
+                   
+                   //creating NSMutableURLRequest
+            let request = NSMutableURLRequest(url: requestURL!)
+                    
+                         //setting the method to post
+            request.httpMethod = "GET"
+
+            //creating a task to send the post request
+            
+            let task = URLSession.shared.dataTask(with: request as URLRequest){
+                   data, response, error in if error != nil{
+                    
+                       print("error is \(error)")
+                 
+                   }
+                QueryDatabase(query: "DELETE FROM USERS")
+                 
+                   //parsing the response
+                   do {
+                       
+                       //converting resonse to NSDictionary
+                       var teamJSON: NSDictionary!
+                    teamJSON =  try JSONSerialization.jsonObject(with: data!, options: .mutableContainers) as? NSDictionary
+                       
+                       //getting the JSON array teams from the response
+                       let teams: NSArray = teamJSON["users"] as! NSArray
+                       
+                       //looping through all the json objects in the array teams
+                       for i in 0 ..< teams.count{
+                           //getting the data at each index
+                           //getting the data at each index
+                        let teamId:Int = ((teams[i] as! NSDictionary)["id"] as! Int?)!
+                        let username:String = ((teams[i] as! NSDictionary)["username"] as! String?)!
+                           let password:String = ((teams[i] as! NSDictionary)["password"] as! String?)!
+                         //  print(username + " added")
+                          insertIntoUsers(username: username, password: password)
+                        
+                        
+                    
+                           
+                               
+                           
+                           
+
+                       }
+                       
+                   
+                           } catch {
+                                   print(error)
+                           } //doend
+                   
+       
+                
+               }
+       
+                    task.resume()
+
+            
+     
+       
+       
+   }
+
+func deleteUsers(){
+    var stmt: OpaquePointer?
+         
+           let str = NSString .localizedStringWithFormat("DELETE FROM users" )
+                let queryString = String(str)
+
+                if sqlite3_prepare(db, queryString, -1, &stmt, nil) != SQLITE_OK{
+                    let errmsg = String(cString: sqlite3_errmsg(db)!)
+                    print("error preparing inserting users: \(errmsg)")
+                    return
+                }
+                
+                if sqlite3_step(stmt) != SQLITE_DONE {
+                    let errmsg = String(cString: sqlite3_errmsg(db)!)
+                    print("failure inserting users: \(errmsg)")
+                    return
+                }
+}
+
+
+
+
+
+
+
+
+
+ var db: OpaquePointer?
+
+func authenticate(USERNAME :String , PASSWORD :String) ->Bool{ //returns true if USERNAME and PASS matches user database
+    var ge: OpaquePointer?
+         let queryStringz = "SELECT * FROM users"
+                 if sqlite3_prepare(db, queryStringz, -1, &ge, nil) != SQLITE_OK{
+                     let errmsg = String(cString: sqlite3_errmsg(db)!)
+                     print("error  Retrieving users: \(errmsg)")
+                     return false
+                 }
+                 
+
+                 while(sqlite3_step(ge) == SQLITE_ROW) {
+                     
+                     let id = sqlite3_column_int(ge, 0)
+                     let username = String(cString: sqlite3_column_text(ge, 1))
+                     let password = String(cString: sqlite3_column_text(ge, 2))
+                    if(USERNAME == username && PASSWORD == password){
+
+                        print("matching user: " + USERNAME + " " + PASSWORD)
+                        return true
+                    }
+                 }
+    return false
+}
+
+
+
+
+
+
+    
+       
+
+           
+
+
+
+      
