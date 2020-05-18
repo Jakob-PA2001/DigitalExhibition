@@ -35,24 +35,35 @@ struct HomeScreen: View {
                             }
                             .foregroundColor(Color.black)
                         }
+                        .offset(y: 150)
+                        
+                        CirclesOfEmotion()
+                        .offset(x: 200, y: 300)
+                        
                         // Earthquake video
-                        EarthquakeVideo(displayPopup: $displayPopup, choice: $choice)// End Group
-                            //.offset(x: 100)
+                        EarthquakeVideo(displayPopup: $displayPopup, choice: $choice)
+                        .offset(x: -160, y: -100)
+                        
                         //Video 1
-                        Video1(displayPopup: $displayPopup, choice: $choice)// End Group
+                        Video1(displayPopup: $displayPopup, choice: $choice)
+                        .offset(x: -200, y: -100)
                         
                         //Video 2
-                        Video2(displayPopup: $displayPopup, choice: $choice)// End Group
+                        Video2(displayPopup: $displayPopup, choice: $choice)
+                        .offset(x: -200, y: -100)
                         
                         //Video 3
-                        Video3(displayPopup: $displayPopup, choice: $choice)// End Group
+                        Video3(displayPopup: $displayPopup, choice: $choice)
+                        .offset(x: -180, y: -100)
                         
                         //Langtang information
-                        AboutLangtang(displayPopup: $displayPopup, choice: $choice)// End Group
+                        AboutLangtang(displayPopup: $displayPopup, choice: $choice)
+                        .offset(x: 200, y: -200)
+                        
                     }// End VStack
                     .padding()
                 }// End ZStack
-                .edgesIgnoringSafeArea(.top)
+                //.edgesIgnoringSafeArea(.top)
             }
         }
     }
@@ -170,6 +181,27 @@ struct Video3: View {
     }
 }
 
+struct CirclesOfEmotion: View {
+    var body: some View {
+        Group {
+            Button(action: {self.RedirectQuiz()}) {
+                VStack {
+                    Text("Take the circles of emotion quiz!")
+                    Image("circle")
+                        .shadow(radius: 10)
+                }
+            }// End button
+            .buttonStyle(PlainButtonStyle())
+        }
+    }
+    
+    func RedirectQuiz() {
+        if let url = URL(string: "https://circlesofemotion.org") {
+            UIApplication.shared.open(url)
+        }
+    }// End func
+}
+
 struct AboutLangtang: View {
     
     @Binding var displayPopup: Bool
@@ -278,4 +310,5 @@ struct HomeScreen_Previews: PreviewProvider {
         HomeScreen()
     }
 }
+
 
