@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct VideoGallery: View {
     
@@ -133,7 +134,7 @@ struct Videos: View {
             }
             else {
                 VStack {
-                    /*refresh(allowRefresh: $allowRefresh, refreshCount: $refreshCount, refreshIcon: $refreshIcon)*/
+                    refresh(allowRefresh: $allowRefresh, refreshCount: $refreshCount, refreshIcon: $refreshIcon)
                     // add content below refresh
 
                         
@@ -145,7 +146,7 @@ struct Videos: View {
                           Text( videoAttributes.description)
                                              
                          }.navigationBarTitle(Text("Videos")).navigationBarItems(
-                            trailing: Button(action: addvideos, label: {refresh(allowRefresh: self.$allowRefresh, refreshCount: self.$refreshCount, refreshIcon: self.$refreshIcon)}))//navlink
+                            trailing: Button(action: {addvideos()}, label: {Text("Sync")}))//navlink
                          Text("View Video")
                 
                         
@@ -165,8 +166,93 @@ struct UserManagement: View {
 }
 
 struct SurveyManagement: View {
+    
+    let surveys = SurveyDBManager().retrieveAttr()
+    //let surveySid = SurveyDBManager().retrieveSid()
+    //var new = surveys.split(separator: ",")
+    @State var alternate: Bool = false
+    @State private var width: CGFloat? = nil
+    
     var body: some View {
-        Text("Survey Management")
+        VStack {
+            HStack {
+                Spacer()
+                Button(action: {
+                    let db = SurveyDBManager()
+                    db.submitSurvey()
+                }) {
+                    Text("Upload Surveys")
+                    Image(systemName: "square.and.arrow.up")
+                }
+                .padding(.trailing)
+            }
+            Text("Survey Management")
+            if(surveys.isEmpty) {
+                Text("No survey data is available to display.")
+            }
+            else {
+                List(surveys, id: \.sid) {surveys in
+                    HStack {
+                        Text(surveys.sid)
+                            .frame(width: self.width, alignment: .leading)
+                            .lineLimit(1)
+                            .background(CenteringView())
+                        Spacer()
+                        Text(surveys.age)
+                            .frame(width: self.width, alignment: .leading)
+                            .lineLimit(1)
+                            .background(CenteringView())
+                        Spacer()
+                        Text(surveys.gender)
+                            .frame(width: self.width, alignment: .leading)
+                            .lineLimit(1)
+                            .background(CenteringView())
+                        Spacer()
+                        Text(surveys.nationality)
+                            .frame(width: self.width, alignment: .leading)
+                            .lineLimit(1)
+                            .background(CenteringView())
+                    }.onPreferenceChange(CenteringColumnPreferenceKey.self) { preferences in
+                        for p in preferences {
+                            let oldWidth = self.width ?? CGFloat.zero
+                            if p.width > oldWidth {
+                                self.width = p.width
+                            }
+                        }
+                    }
+                }
+            }
+            
+        }//End VStack
+    }// End body
+}
+/*
+ The following 
+ */
+struct CenteringColumnPreferenceKey: PreferenceKey {
+    typealias Value = [CenteringColumnPreference]
+
+    static var defaultValue: [CenteringColumnPreference] = []
+
+    static func reduce(value: inout [CenteringColumnPreference], nextValue: () -> [CenteringColumnPreference]) {
+        value.append(contentsOf: nextValue())
+    }
+}
+
+struct CenteringColumnPreference: Equatable {
+    let width: CGFloat
+}
+
+struct CenteringView: View {
+    var body: some View {
+        GeometryReader { geometry in
+            Rectangle()
+                .fill(Color.clear)
+                .preference(
+                    key: CenteringColumnPreferenceKey.self,
+                    value: [CenteringColumnPreference(width: geometry.frame(in: CoordinateSpace.global).width)]
+                )
+        }
     }
 }
 
