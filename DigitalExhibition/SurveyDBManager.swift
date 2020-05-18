@@ -1,15 +1,15 @@
 //
-//  DBManager.swift
+//  SurveyDBManager.swift
 //  DigitalExhibition
 //
-//  Created by Admin on 11/5/20.
+//  Created by Admin on 18/5/20.
 //  Copyright © 2020 PA2001. All rights reserved.
 //
 
-import UIKit
+import SwiftUI
 import CoreData
 
-class SurveyManager: NSObject {
+class SurveyDBManager: NSObject {
     
     var products: [NSManagedObject] = []
     
@@ -127,5 +127,4 @@ class SurveyManager: NSObject {
             catch {  }
     }
     //}
-
 }

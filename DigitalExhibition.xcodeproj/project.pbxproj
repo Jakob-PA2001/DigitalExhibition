@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		840A7AA9246E64C500FB03AE /* TestScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840A7AA8246E64C500FB03AE /* TestScreen.swift */; };
+		8419BC062472705600CDA74A /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8419BC052472705600CDA74A /* VideoView.swift */; };
+		8419BC082472707400CDA74A /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8419BC072472707300CDA74A /* Utility.swift */; };
+		8419BC0A2472708500CDA74A /* DatabaseMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8419BC092472708500CDA74A /* DatabaseMethod.swift */; };
+		8419BC0C247275A300CDA74A /* SurveyDBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8419BC0B247275A300CDA74A /* SurveyDBManager.swift */; };
 		841EC9CA245FF842007D6D3D /* SplashScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841EC9C9245FF842007D6D3D /* SplashScreen.swift */; };
 		841EC9CC245FF86E007D6D3D /* SurveyScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841EC9CB245FF86E007D6D3D /* SurveyScreen.swift */; };
 		841EC9CE245FF8A7007D6D3D /* HomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841EC9CD245FF8A7007D6D3D /* HomeScreen.swift */; };
@@ -22,7 +26,6 @@
 		848C7A8E245955A0000C4017 /* DigitalExhibitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848C7A8D245955A0000C4017 /* DigitalExhibitionTests.swift */; };
 		848C7A99245955A0000C4017 /* DigitalExhibitionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848C7A98245955A0000C4017 /* DigitalExhibitionUITests.swift */; };
 		84FBE6AF2469031000F7DDFC /* DigitalExhibition.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 84FBE6AD2469031000F7DDFC /* DigitalExhibition.xcdatamodeld */; };
-		84FBE6B12469054B00F7DDFC /* DBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FBE6B02469054B00F7DDFC /* DBManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +47,10 @@
 
 /* Begin PBXFileReference section */
 		840A7AA8246E64C500FB03AE /* TestScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestScreen.swift; sourceTree = "<group>"; };
+		8419BC052472705600CDA74A /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
+		8419BC072472707300CDA74A /* Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
+		8419BC092472708500CDA74A /* DatabaseMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseMethod.swift; sourceTree = "<group>"; };
+		8419BC0B247275A300CDA74A /* SurveyDBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyDBManager.swift; sourceTree = "<group>"; };
 		841EC9C9245FF842007D6D3D /* SplashScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreen.swift; sourceTree = "<group>"; };
 		841EC9CB245FF86E007D6D3D /* SurveyScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurveyScreen.swift; sourceTree = "<group>"; };
 		841EC9CD245FF8A7007D6D3D /* HomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreen.swift; sourceTree = "<group>"; };
@@ -64,7 +71,6 @@
 		848C7A98245955A0000C4017 /* DigitalExhibitionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DigitalExhibitionUITests.swift; sourceTree = "<group>"; };
 		848C7A9A245955A0000C4017 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		84FBE6AE2469031000F7DDFC /* DigitalExhibition.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DigitalExhibition.xcdatamodel; sourceTree = "<group>"; };
-		84FBE6B02469054B00F7DDFC /* DBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,13 +123,16 @@
 			children = (
 				848C7A762459559E000C4017 /* AppDelegate.swift */,
 				84FBE6AD2469031000F7DDFC /* DigitalExhibition.xcdatamodeld */,
-				84FBE6B02469054B00F7DDFC /* DBManager.swift */,
+				8419BC0B247275A300CDA74A /* SurveyDBManager.swift */,
 				848C7A782459559E000C4017 /* SceneDelegate.swift */,
 				848C7A7A2459559E000C4017 /* ContentView.swift */,
 				841EC9C9245FF842007D6D3D /* SplashScreen.swift */,
 				841EC9CB245FF86E007D6D3D /* SurveyScreen.swift */,
 				841EC9CF2460027E007D6D3D /* LogIn.swift */,
 				842219A8246148440079241B /* VideoGallery.swift */,
+				8419BC052472705600CDA74A /* VideoView.swift */,
+				8419BC072472707300CDA74A /* Utility.swift */,
+				8419BC092472708500CDA74A /* DatabaseMethod.swift */,
 				840A7AA8246E64C500FB03AE /* TestScreen.swift */,
 				841EC9CD245FF8A7007D6D3D /* HomeScreen.swift */,
 				848C7A7C245955A0000C4017 /* Assets.xcassets */,
@@ -291,17 +300,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8419BC062472705600CDA74A /* VideoView.swift in Sources */,
 				841EC9CA245FF842007D6D3D /* SplashScreen.swift in Sources */,
 				848C7A772459559E000C4017 /* AppDelegate.swift in Sources */,
 				841EC9CE245FF8A7007D6D3D /* HomeScreen.swift in Sources */,
 				841EC9D02460027E007D6D3D /* LogIn.swift in Sources */,
 				842219A9246148440079241B /* VideoGallery.swift in Sources */,
-				84FBE6B12469054B00F7DDFC /* DBManager.swift in Sources */,
+				8419BC0A2472708500CDA74A /* DatabaseMethod.swift in Sources */,
+				8419BC082472707400CDA74A /* Utility.swift in Sources */,
 				848C7A792459559E000C4017 /* SceneDelegate.swift in Sources */,
 				84FBE6AF2469031000F7DDFC /* DigitalExhibition.xcdatamodeld in Sources */,
 				840A7AA9246E64C500FB03AE /* TestScreen.swift in Sources */,
 				848C7A7B2459559E000C4017 /* ContentView.swift in Sources */,
 				841EC9CC245FF86E007D6D3D /* SurveyScreen.swift in Sources */,
+				8419BC0C247275A300CDA74A /* SurveyDBManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
