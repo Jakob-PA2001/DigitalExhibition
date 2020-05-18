@@ -126,11 +126,13 @@ struct Survey: View {
                     Button(action: {
                         //self.debugging()
                         //self.deleteALLSurveyData()
-                        //self.save()
+                        self.save()
                         //self.submitSurvey()
                         if (self.completed == false) {
                             self.completed = true
-                            self.retrieve()                    }
+                            //self.retrieve()
+                            
+                        }
                     }) {
                         Text("Submit")
                             .font(.title)

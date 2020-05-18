@@ -10,6 +10,10 @@ import SwiftUI
 
 struct HomeScreen: View {
     @State private var displayPopup: Bool = false
+    @State private var displayVideo: Bool = false
+    @State private var displayVideo1: Bool = false
+    @State private var displayVideo2: Bool = false
+    @State private var displayVideo3: Bool = false
     @State private var show_info: Bool = false
     @State private var choice: Int = 0
     @State private var finishViewing: Bool = false
@@ -20,10 +24,23 @@ struct HomeScreen: View {
             if(finishViewing) {
                 SplashScreen()
             }
+            else if(displayVideo) {
+                EarthquakeVideo()
+            }
+            else if(displayVideo1) {
+                Video1()
+            }
+            else if(displayVideo2) {
+                Video2()
+            }
+            else if(displayVideo3) {
+                Video3()
+            }
             else {
-                ZStack(/*alignment: .leading*/) {
+                VStack(/*alignment: .leading*/) {
                     Color(red: 66/255.0, green: 142/255.0, blue: 146/255.0, opacity: 1.0)
                     VStack {
+                        // Exit Button
                         HStack {
                             Button(action: {
                                 if(self.finishViewing == false) {
@@ -41,23 +58,23 @@ struct HomeScreen: View {
                         .offset(x: 200, y: 300)
                         
                         // Earthquake video
-                        EarthquakeVideo(displayPopup: $displayPopup, choice: $choice)
+                        EarthquakeVideoButton(displayVideo: $displayVideo, choice: $choice)
                         .offset(x: -160, y: -100)
                         
                         //Video 1
-                        Video1(displayPopup: $displayPopup, choice: $choice)
+                        Video1Button(displayVideo1: $displayVideo1, choice: $choice)
                         .offset(x: -200, y: -100)
                         
                         //Video 2
-                        Video2(displayPopup: $displayPopup, choice: $choice)
+                        Video2Button(displayVideo2: $displayVideo2, choice: $choice)
                         .offset(x: -200, y: -100)
                         
                         //Video 3
-                        Video3(displayPopup: $displayPopup, choice: $choice)
+                        Video3Button(displayVideo3: $displayVideo3, choice: $choice)
                         .offset(x: -180, y: -100)
                         
                         //Langtang information
-                        AboutLangtang(displayPopup: $displayPopup, choice: $choice)
+                        AboutLangtang(displayPopup: $displayPopup/*, choice: $choice*/)
                         .offset(x: 200, y: -200)
                         
                     }// End VStack
@@ -70,15 +87,104 @@ struct HomeScreen: View {
 }
 
 struct EarthquakeVideo: View {
+    @State var goBack: Bool = false
+    var body: some View {
+        return Group {
+            if(self.goBack) {
+                HomeScreen()
+            }
+            else {
+                VStack {
+                Button(action: {
+                    if(self.goBack == false) {
+                        self.goBack = true
+                    }
+                }){
+                    Text("Return Home")
+                }
+                Text("Earthquake Text and vid link")
+            }
+            }
+        }
+    }
+}
+
+struct Video1: View {
+    @State var goBack: Bool = false
+    var body: some View {
+        return Group {
+            if(self.goBack) {
+                HomeScreen()
+            }
+            else {
+                Button(action: {
+                    if(self.goBack == false) {
+                        self.goBack = true
+                    }
+                }){
+                    Text("Return Home")
+                }
+                Text("Vid 1 text and vid link")
+            }
+        }
+    }
+}
+
+struct Video2: View {
+    @State var goBack: Bool = false
+    var body: some View {
+        return Group {
+            if(self.goBack) {
+                HomeScreen()
+            }
+            else {
+                Button(action: {
+                    if(self.goBack == false) {
+                        self.goBack = true
+                    }
+                }){
+                    Text("Return Home")
+                }
+                Text("Vid 2 Text and vid link")
+            }
+        }
+    }
+}
+
+struct Video3: View {
+    @State var goBack: Bool = false
+    var body: some View {
+        return Group {
+            if(self.goBack) {
+                HomeScreen()
+            }
+            else {
+                Button(action: {
+                    if(self.goBack == false) {
+                        self.goBack = true
+                    }
+                }){
+                    Text("Return Home")
+                }
+                Text("Vid 3 Text and vid link")
+            }
+        }
+    }
+}
+
+struct EarthquakeVideoButton: View {
     
-    @Binding var displayPopup: Bool
+    @Binding var displayVideo: Bool
     @Binding var choice: Int
     
     var body: some View {
         Group {
             Button(action: {
-                self.displayPopup = true
-                self.choice = 1
+                if(self.displayVideo == false) {
+                    self.displayVideo = true
+                }
+                //self.displayPopup = true
+                //self.choice = 1
             }) {
                 HStack {
                     Image("preview.4")
@@ -89,24 +195,27 @@ struct EarthquakeVideo: View {
                     Text("What to do in the event of an earthquake")
                 }
             }// End button
-                .sheet(isPresented: self.$displayPopup) {
-                    PopUp(choice: self.$choice)
-            }
+                //.sheet(isPresented: self.$displayPopup) {
+                    //PopUp(choice: self.$choice)
+            //}
             .buttonStyle(PlainButtonStyle())
         }
     }
 }
 
-struct Video1: View {
+struct Video1Button: View {
     
-    @Binding var displayPopup: Bool
+    @Binding var displayVideo1: Bool
     @Binding var choice: Int
     
     var body: some View {
         Group {
             Button(action: {
-                self.displayPopup = true
-                self.choice = 1
+                if(self.displayVideo1 == false) {
+                    self.displayVideo1 = true
+                }
+                //self.displayPopup = true
+                //self.choice = 1
             }) {
                 HStack {
                     Image("preview.1")
@@ -117,24 +226,27 @@ struct Video1: View {
                     Text("Stories from Langtang")
                 }
             }// End button
-                .sheet(isPresented: self.$displayPopup) {
-                    PopUp(choice: self.$choice)
-            }
+                //.sheet(isPresented: self.$displayPopup) {
+                    //PopUp(choice: self.$choice)
+            //}
             .buttonStyle(PlainButtonStyle())
         }
     }
 }
 
-struct Video2: View {
+struct Video2Button: View {
     
-    @Binding var displayPopup: Bool
+    @Binding var displayVideo2: Bool
     @Binding var choice: Int
     
     var body: some View {
         Group {
             Button(action: {
-                self.displayPopup = true
-                self.choice = 1
+                if(self.displayVideo2 == false) {
+                    self.displayVideo2 = true
+                }
+                //self.displayPopup = true
+                //self.choice = 1
             }) {
                 HStack {
                     Image("preview.2")
@@ -145,24 +257,27 @@ struct Video2: View {
                     Text("Stories from Langtang")
                 }
             }// End button
-                .sheet(isPresented: self.$displayPopup) {
-                    PopUp(choice: self.$choice)
-            }
+                //.sheet(isPresented: self.$displayPopup) {
+                    //PopUp(choice: self.$choice)
+            //}
             .buttonStyle(PlainButtonStyle())
         }
     }
 }
 
-struct Video3: View {
+struct Video3Button: View {
     
-    @Binding var displayPopup: Bool
+    @Binding var displayVideo3: Bool
     @Binding var choice: Int
     
     var body: some View {
         Group {
             Button(action: {
-                self.displayPopup = true
-                self.choice = 1
+                if(self.displayVideo3 == false) {
+                    self.displayVideo3 = true
+                }
+                //self.displayPopup = true
+                //self.choice = 1
             }) {
                 HStack {
                     Image("preview.3")
@@ -173,9 +288,9 @@ struct Video3: View {
                     Text("Stories from Langtang")
                 }
             }// End button
-                .sheet(isPresented: self.$displayPopup) {
-                    PopUp(choice: self.$choice)
-            }
+                //.sheet(isPresented: self.$displayPopup) {
+                    //PopUp(choice: self.$choice)
+            //}
             .buttonStyle(PlainButtonStyle())
         }
     }
@@ -205,13 +320,13 @@ struct CirclesOfEmotion: View {
 struct AboutLangtang: View {
     
     @Binding var displayPopup: Bool
-    @Binding var choice: Int
+    //@Binding var choice: Int
     
     var body: some View {
         Group {
             Button(action: {
                 self.displayPopup = true
-                self.choice = 2
+                //self.choice = 2
             }) {
                 HStack {
                     Image("heritage")
@@ -220,7 +335,7 @@ struct AboutLangtang: View {
                 }
             }// End button
                 .sheet(isPresented: self.$displayPopup) {
-                    PopUp(choice: self.$choice)
+                    PopUp(/*choice: self.$choice*/)
             }
             .buttonStyle(PlainButtonStyle())
         }
@@ -229,21 +344,22 @@ struct AboutLangtang: View {
     
 struct PopUp: View {
     
-    @Binding var choice: Int
+    //@Binding var choice: Int
     
     var body: some View {
-        return Group {
+        DisplayText()
+        /*return Group {
             if(choice == 1) {
-                DisplayVideo()
+                HomeScreen()
             }
             else if(choice == 2) {
                 DisplayText()//End ZStack
             }
-        }
+        }*/
     }
 }
 
-struct DisplayVideo: View {
+/*struct DisplayVideo: View {
     @Environment(\.presentationMode) var presentationMode
     var body: some View {
         VStack {
@@ -259,7 +375,7 @@ struct DisplayVideo: View {
             }.padding(.bottom, 50)
         }
     }
-}
+}*/
 
 struct DisplayText: View {
     @Environment(\.presentationMode) var presentationMode
