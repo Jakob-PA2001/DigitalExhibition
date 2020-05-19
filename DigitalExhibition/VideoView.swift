@@ -27,7 +27,7 @@ class VideoPlayerUIView: UIView {
         
         super.init(frame: .zero)
     
-        backgroundColor = .lightGray
+        backgroundColor = .black
         playerLayer.player = player
         layer.addSublayer(playerLayer)
         
@@ -206,7 +206,7 @@ struct VideoPlayerContainerView : View {
 
 struct VideoView: View {
    let link: String
-   
+
     var body: some View {
        
         VideoPlayerContainerView(url: URL(string: link)!)

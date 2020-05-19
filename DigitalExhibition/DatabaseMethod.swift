@@ -124,17 +124,13 @@ func SyncVideoDatabase(){
                           let videoNo:Int = ((video[i] as! NSDictionary)["videoNo"] as! Int?)!
                           let videoName:String = ((video[i] as! NSDictionary)["videoName"] as! String?)!
                             let videoUrl:String = ((video[i] as! NSDictionary)["videoUrl"] as! String?)!
+                            let deviceNo:String = ((video[i] as! NSDictionary)["deviceNo"] as! String?)!
                              let Description:String = ((video[i] as! NSDictionary)["Description"] as! String?)!
                             
                             print(videoNo, " added")
                             let str = NSString .localizedStringWithFormat("INSERT INTO videos(videoNo, videoname,videoURL, description) VALUES('%@', '%@', '%@','%@')", String(videoNo), videoName,videoUrl,Description)
                                 QueryDatabase(query: str as String)
-                            
-                         /*
-                             
-                               let str = NSString .localizedStringWithFormat("INSERT INTO users(username, password) VALUES('%@', '%@')", username, password)
-                             */
-
+                 
                          }
                              } catch {
                                      print(error)

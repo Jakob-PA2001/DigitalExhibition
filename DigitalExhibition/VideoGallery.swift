@@ -88,42 +88,56 @@ struct Menu: View {
     }
 }
 
-
 struct videoAttributes {
   let videoname: String
   let description: String
   let videoNo : String
+  let Url : String
 }
 var videoList = [
-    videoAttributes(videoname: "kwUNhM2A3nT4WPsOF0WYjZPtxJwt6mFABh0724FP.mp4", description: "afd", videoNo: "afd"),
+    videoAttributes(videoname: "kwUNhM2A3nT4WPsOF0WYjZPtxJwt6mFABh0724FP.mp4", description: "afd", videoNo: "afd", Url: ""),
 ]
 
 func addvideos(){
     
-    videoList.append(videoAttributes.init(videoname: "testadd", description: "testadd", videoNo: "testadd"))
-    downloadVideos(filename: "kwUNhM2A3nT4WPsOF0WYjZPtxJwt6mFABh0724FP.mp4")
+    print("Syncing video database from server...")
     
-   //findlocalDir(filename: "kwUNhM2A3nT4WPsOF0WYjZPtxJwt6mFABh0724FP.mp4")
+    SyncVideoDatabase() //sync server database files
     
-    /*if(showvideoDatabase()==true){ // if database is not empty
-        for n in 1 ... getTableSize(tablename: "videos") {
-            print("tablesize", n)
+    if(showvideoDatabase()==true){ // if database is not empty
+           videoList.removeAll()
+             print("Syncing complete, Download videos from server")
+        var videosize = getTableSize(tablename: "videos")
+             for n in 1 ... videosize{
+                print("downloading video:", n,"/",videosize)
 
-            videoList.append(videoAttributes.init(videoname: returnVideoNo(row: n, coloumname: "videono"), description:returnVideoNo(row: n, coloumname: "videoname"),videoNo:returnVideoNo(row: n, coloumname: "videono") )
-            )
-  }//for ends
-            
-        }else{
-            SyncVideoDatabase() //sync server database files
+                downloadVideos(filename: returnVideoNo(row: n, coloumname: "videoUrl"))
+                 
+       }//for ends
+    }
+}
 
-        }*/
- 
+func loadvideosScreen(){ //loads array into screen for refresh
+    if(showvideoDatabase()==true){ // if database is not empty
+        videoList.removeAll()
+          print("adding video database to screen")
+          for n in 1 ... getTableSize(tablename: "videos") {
+              print("tablesize", n)
+
+              videoList.append(videoAttributes.init(videoname: returnVideoNo(row: n, coloumname: "videono"), description:returnVideoNo(row: n, coloumname: "videoname"),videoNo:returnVideoNo(row: n, coloumname: "videono") ,Url: returnVideoNo(row: n, coloumname: "videoUrl"))
+              )
+    }//for ends
+              
+          }
+    
+    
     
 }
 
 struct Videos: View {
     
     @Binding var allowRefresh: Bool
+    @State var newVideoList = videoList
     @State var refreshCount = 0
     @State var refreshIcon: String = "rays"
     
@@ -138,7 +152,7 @@ struct Videos: View {
                     // add content below refresh
 
                         
-                    List(videoList, id: \.videoNo) { videoAttributes in
+                    List(newVideoList, id: \.videoNo) { videoAttributes in
 
                      NavigationLink(destination: VideoView(link:  findlocalDir(filename: videoAttributes.videoname).absoluteString) ) {
                                            
@@ -146,7 +160,11 @@ struct Videos: View {
                           Text( videoAttributes.description)
                                              
                          }.navigationBarTitle(Text("Videos")).navigationBarItems(
-                            trailing: Button(action: {addvideos()}, label: {Text("Sync")}))//navlink
+                            trailing: Button(action: {
+                                addvideos()
+                                self.newVideoList = videoList
+                                
+                            }, label: {Text("Sync")}))//navlink
                          Text("View Video")
                 
                         
@@ -160,70 +178,327 @@ struct Videos: View {
 }
 
 struct UserManagement: View {
+    
+    @State var users = UserDBManager().retrieveUserAttr()
+    @State private var width: CGFloat? = nil
+    @State var showAddView: Bool = false
+    @State var showDeleteView: Bool = false
+    
     var body: some View {
-        Text("User Management")
+        VStack {
+            VStack{
+                HStack {
+                    NavigationLink(destination: ShowAddView(users: self.$users)) {
+                            HStack(alignment: .firstTextBaseline) {
+                                Text("Add User")
+                                Image(systemName: "person.crop.circle.badge.plus")
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                            }
+                    }
+                    Spacer()
+                }.padding(.leading)
+                Rectangle()
+                    .frame(height: 1)
+                    .foregroundColor(Color(red: 238.0/255.0, green: 238.0/255.0, blue: 238.0/255.0, opacity: 1.0))
+                HStack {
+                    NavigationLink(destination: ShowDeleteView(users: self.$users)) {
+                            HStack(alignment: .firstTextBaseline) {
+                                Text("Delete User")
+                                Image(systemName: "person.crop.circle.badge.minus")
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                            }
+                    }
+                    Spacer()
+                }.padding(.leading)
+            }
+            Rectangle()
+                .frame(height: 5)
+                .foregroundColor(Color(red: 238.0/255.0, green: 238.0/255.0, blue: 238.0/255.0, opacity: 1.0))
+            List(users, id: \.username) { users in
+                Text(users.username)
+                    .frame(width: self.width, alignment: .leading)
+                    .lineLimit(1)
+                    .background(CenteringView())
+                Spacer()
+                Text(users.password)
+                    .frame(width: self.width, alignment: .leading)
+                    .lineLimit(1)
+                    .background(CenteringView())
+                Spacer()
+            }
+        }// End VStack
+        .navigationBarTitle(Text("User Management")).navigationBarItems(
+        trailing: Button(action: {
+            let db = UserDBManager()
+            db.uploadUsers()
+            
+        }) {
+                Text("Sync Users")
+                Image(systemName: "rays")
+            })
     }
 }
 
+struct ShowAddView: View {
+    @Binding var users: [UserDBManager.userAttr]
+    @State var username = ""
+    @State var password = ""
+    @State var confirmPassword = ""
+    @State var hidePass: Bool = false
+    @State var errMessage = ""
+    @State var successfullAdd: Bool = false
+    
+    var body: some View {
+        VStack {
+            Text("Add New User")
+                .font(.title)
+            Text("Fill in the following form:")
+            Text(errMessage)
+                .foregroundColor(Color.red)
+            VStack {
+                Section {
+                    Text("Enter a Username")
+                        .font(.headline)
+                        .padding(.bottom, -20)
+                    TextField("", text: self.$username)
+                        .padding()
+                        //.fixedSize()
+                        .frame(width: 600)
+                        //.frame(width: UIScreen.main.bounds.width - 34)
+                        .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                        .cornerRadius(10)
+                }
+                .padding()
+                Section {
+                    Text("Enter a Password")
+                        .font(.headline)
+                        .padding(.bottom, -20)
+                    SecureField("", text: self.$password)
+                        .padding()
+                        //.fixedSize()
+                        .frame(width: 600)
+                        //.frame(width: UIScreen.main.bounds.width - 34)
+                        .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 0.5))
+                        .cornerRadius(10)
+                    }
+                .padding()
+                Section {
+                    Text("Confirm Password")
+                        .font(.headline)
+                    SecureField("", text: self.$confirmPassword)
+                        .padding()
+                        //.fixedSize()
+                        .frame(width: 600)
+                        //.frame(width: UIScreen.main.bounds.width - 34)
+                        .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 0.5))
+                        .cornerRadius(10)
+                    }//Section
+                }
+                .padding()
+                HStack {
+                    Button(action: {
+                        if(self.username.isEmpty || self.password.isEmpty || self.confirmPassword.isEmpty) {
+                            self.errMessage = "Please fill in all the fields"
+                        }
+                        else if(self.password != self.confirmPassword) {
+                            self.errMessage = "Passwords do not match!"
+                        }
+                        else {
+                            self.addUser()
+                        }
+                    }) {
+                        Text("Add User")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .padding()
+                        .fixedSize()
+                        .frame(width: 140, height: 45)
+                        .foregroundColor(.white)
+                        .background(Color.black)
+                        .cornerRadius(8)
+                    }
+                }//HStack
+            }//Vstack
+            .offset(y: -100)
+        }
+    func addUser(){
+        var userExists: Bool = false
+        let db = UserDBManager()
+        userExists = db.doesUserExist(username: self.username)
+        if(userExists) {
+            errMessage = "Username already exists!"
+        }
+        else {
+            db.addUser(username: self.username, password: self.password)
+            errMessage = "User has successfully been added!"
+            users = UserDBManager().retrieveUserAttr()
+            self.username = ""
+            self.password = ""
+            self.confirmPassword = ""
+        }
+    }
+}
+
+struct ShowDeleteView: View {
+    @Binding var users: [UserDBManager.userAttr]
+    
+    @State var errMessage = ""
+    @State var username = ""
+    @State var popUpConfirm: Bool = false
+    @State var confirm: Bool = false
+    
+    var body: some View {
+        return Group {
+            VStack {
+                VStack {
+                    Text("Delete User")
+                        .font(.title)
+                    Text("Please enter the username of the user to be deleted:")
+                    Text(errMessage)
+                        .foregroundColor(Color.red)
+                    VStack {
+                        Section {
+                            Text("Username")
+                                .font(.headline)
+                                .padding(.bottom, -20)
+                            TextField("", text: self.$username)
+                                .padding()
+                                .frame(width: 600)
+                                //.frame(width: UIScreen.main.bounds.width - 34)
+                                .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                                .cornerRadius(10)
+                        }
+                        .padding()
+                        Button(action: {
+                            if(self.username.isEmpty) {
+                                self.errMessage = "Please enter a username!"
+                            }else {
+                                self.errMessage = ""
+                                self.popUpConfirm = true
+                            }
+                        }) {
+                            Text("Delete User")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                            .padding()
+                            .fixedSize()
+                            .frame(width: 140, height: 45)
+                            .foregroundColor(.white)
+                            .background(Color.black)
+                            .cornerRadius(8)
+                        }.sheet(isPresented: self.$popUpConfirm) {
+                            ConfirmDelete(users: self.$users, username: self.$username, errMessage: self.$errMessage)
+                        }
+                    }
+                }
+            }//Vstack
+        }// End VStack
+    }
+    
+    struct ConfirmDelete: View {
+        @Environment(\.presentationMode) var presentationMode
+        @Binding var users: [UserDBManager.userAttr]
+        @Binding var username: String
+        @Binding var errMessage: String
+        var body: some View {
+            VStack {
+                Text("Please tap confirm to delete user: " + self.username)
+                    .font(.headline)
+                    .padding()
+                Button(action: {
+                    if(deleteUser(username: self.username)) {
+                        self.username = ""
+                        self.errMessage = "User has successfully been deleted."
+                        self.users = UserDBManager().retrieveUserAttr()
+                        self.presentationMode.wrappedValue.dismiss()
+                    }
+                    else {
+                        self.username = ""
+                        self.errMessage = "User does not exist!"
+                        self.presentationMode.wrappedValue.dismiss()
+                    }
+                }) {
+                    Text("Confirm")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .padding()
+                    .fixedSize()
+                    .frame(width: 140, height: 45)
+                    .foregroundColor(.white)
+                    .background(Color(red: 183/255.0, green: 28/255.0, blue: 28/255.0, opacity: 1.0))
+                    .cornerRadius(8)
+                }
+            }
+        }
+    }
+}
+
+func deleteUser(username: String) -> Bool{
+    
+    var userExists: Bool = false
+    let db = UserDBManager()
+    userExists = db.doesUserExist(username: username)
+    
+    if(!userExists) {
+        return false
+    }
+    else {
+        db.deleteUser(username: username)
+        return true
+    }
+}
+
+
 struct SurveyManagement: View {
     
-    let surveys = SurveyDBManager().retrieveAttr()
-    //let surveySid = SurveyDBManager().retrieveSid()
-    //var new = surveys.split(separator: ",")
-    @State var alternate: Bool = false
+    @State var surveys = SurveyDBManager().retrieveAttr()
     @State private var width: CGFloat? = nil
     
     var body: some View {
         VStack {
-            HStack {
-                Spacer()
-                Button(action: {
-                    let db = SurveyDBManager()
-                    db.submitSurvey()
-                }) {
-                    Text("Upload Surveys")
-                    Image(systemName: "square.and.arrow.up")
-                }
-                .padding(.trailing)
-            }
-            Text("Survey Management")
-            if(surveys.isEmpty) {
-                Text("No survey data is available to display.")
-            }
-            else {
-                List(surveys, id: \.sid) {surveys in
-                    HStack {
-                        Text(surveys.sid)
-                            .frame(width: self.width, alignment: .leading)
-                            .lineLimit(1)
-                            .background(CenteringView())
-                        Spacer()
-                        Text(surveys.age)
-                            .frame(width: self.width, alignment: .leading)
-                            .lineLimit(1)
-                            .background(CenteringView())
-                        Spacer()
-                        Text(surveys.gender)
-                            .frame(width: self.width, alignment: .leading)
-                            .lineLimit(1)
-                            .background(CenteringView())
-                        Spacer()
-                        Text(surveys.nationality)
-                            .frame(width: self.width, alignment: .leading)
-                            .lineLimit(1)
-                            .background(CenteringView())
-                    }.onPreferenceChange(CenteringColumnPreferenceKey.self) { preferences in
-                        for p in preferences {
-                            let oldWidth = self.width ?? CGFloat.zero
-                            if p.width > oldWidth {
-                                self.width = p.width
-                            }
+            List(surveys, id: \.sid) {surveys in
+                HStack {
+                    Text(surveys.sid)
+                        .frame(width: self.width, alignment: .leading)
+                        .lineLimit(1)
+                        .background(CenteringView())
+                    Spacer()
+                    Text(surveys.age)
+                        .frame(width: self.width, alignment: .leading)
+                        .lineLimit(1)
+                        .background(CenteringView())
+                    Spacer()
+                    Text(surveys.gender)
+                        .frame(width: self.width, alignment: .leading)
+                        .lineLimit(1)
+                        .background(CenteringView())
+                    Spacer()
+                    Text(surveys.nationality)
+                        .frame(width: self.width, alignment: .leading)
+                        .lineLimit(1)
+                        .background(CenteringView())
+                }.onPreferenceChange(CenteringColumnPreferenceKey.self) { preferences in
+                    for p in preferences {
+                        let oldWidth = self.width ?? CGFloat.zero
+                        if p.width > oldWidth {
+                            self.width = p.width
                         }
                     }
                 }
             }
             
         }//End VStack
+            .navigationBarTitle(Text("Survey Management")).navigationBarItems(
+        trailing: Button(action: {
+                let db = SurveyDBManager()
+                db.submitSurvey()
+                self.surveys = SurveyDBManager().retrieveAttr()
+            }) {
+                Text("Upload Surveys")
+                Image(systemName: "square.and.arrow.up")
+            })
     }// End body
 }
 /*
