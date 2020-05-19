@@ -25,16 +25,16 @@ struct HomeScreen: View {
                 SplashScreen()
             }
             else if(displayVideo) {
-                EarthquakeVideo()
+                EarthquakeVideoInformation(displayPopup: $displayPopup, choice: $choice)
             }
             else if(displayVideo1) {
-                Video1()
+                Video1Information()
             }
             else if(displayVideo2) {
-                Video2()
+                Video2Information()
             }
             else if(displayVideo3) {
-                Video3()
+                Video3Information()
             }
             else {
                 VStack(/*alignment: .leading*/) {
@@ -58,7 +58,7 @@ struct HomeScreen: View {
                         .offset(x: 200, y: 300)
                         
                         // Earthquake video
-                        EarthquakeVideoButton(displayVideo: $displayVideo, choice: $choice)
+                        EarthquakeVideoButton(/*displayPopup: $displayPopup, choice: $choice,*/ displayVideo: $displayVideo)
                         .offset(x: -160, y: -100)
                         
                         //Video 1
@@ -74,7 +74,7 @@ struct HomeScreen: View {
                         .offset(x: -180, y: -100)
                         
                         //Langtang information
-                        AboutLangtang(displayPopup: $displayPopup/*, choice: $choice*/)
+                        AboutLangtang(displayPopup: $displayPopup, choice: $choice)
                         .offset(x: 200, y: -200)
                         
                     }// End VStack
@@ -86,8 +86,12 @@ struct HomeScreen: View {
     }
 }
 
-struct EarthquakeVideo: View {
+struct EarthquakeVideoInformation: View {
+    @Binding var displayPopup: Bool
+    @Binding var choice: Int
     @State var goBack: Bool = false
+    @State var tovideo: Bool = false
+    
     var body: some View {
         return Group {
             if(self.goBack) {
@@ -95,21 +99,39 @@ struct EarthquakeVideo: View {
             }
             else {
                 VStack {
-                Button(action: {
-                    if(self.goBack == false) {
-                        self.goBack = true
+                    Button(action: {
+                        if(self.goBack == false) {
+                            self.goBack = true
+                        }
+                    }){
+                        Text("Return Home")
                     }
-                }){
-                    Text("Return Home")
+
+                    VStack{
+                        Button(action: {
+                            //self.tovideo = true
+                            self.displayPopup = true
+                            self.choice = 1
+                              
+                        }) {
+                            HStack(alignment: .center, spacing: 5.0) {
+                            Image("preview.1").clipShape(Circle()).overlay(Circle().stroke(Color.orange, lineWidth:4) ).shadow(radius: 10)
+                            }
+                        }.sheet(isPresented: self.$displayPopup) {
+                            PopUp(choice: self.$choice)
+                        }
+                      
+                      Text(returnVideoNo(row: 1, coloumname: "videoname")).font(.title)
+                      Text(returnVideoNo(row: 1, coloumname: "description"))
+                      
+                    }
                 }
-                Text("Earthquake Text and vid link")
-            }
-            }
-        }
+            }//End if-else
+        }// End Group
     }
 }
 
-struct Video1: View {
+struct Video1Information: View {
     @State var goBack: Bool = false
     var body: some View {
         return Group {
@@ -130,7 +152,7 @@ struct Video1: View {
     }
 }
 
-struct Video2: View {
+struct Video2Information: View {
     @State var goBack: Bool = false
     var body: some View {
         return Group {
@@ -151,7 +173,7 @@ struct Video2: View {
     }
 }
 
-struct Video3: View {
+struct Video3Information: View {
     @State var goBack: Bool = false
     var body: some View {
         return Group {
@@ -174,8 +196,9 @@ struct Video3: View {
 
 struct EarthquakeVideoButton: View {
     
+    //@Binding var displayPopup: Bool
     @Binding var displayVideo: Bool
-    @Binding var choice: Int
+    //@Binding var choice: Int
     
     var body: some View {
         Group {
@@ -320,13 +343,13 @@ struct CirclesOfEmotion: View {
 struct AboutLangtang: View {
     
     @Binding var displayPopup: Bool
-    //@Binding var choice: Int
+    @Binding var choice: Int
     
     var body: some View {
         Group {
             Button(action: {
                 self.displayPopup = true
-                //self.choice = 2
+                self.choice = 2
             }) {
                 HStack {
                     Image("heritage")
@@ -335,7 +358,7 @@ struct AboutLangtang: View {
                 }
             }// End button
                 .sheet(isPresented: self.$displayPopup) {
-                    PopUp(/*choice: self.$choice*/)
+                    PopUp(choice: self.$choice)
             }
             .buttonStyle(PlainButtonStyle())
         }
@@ -344,25 +367,28 @@ struct AboutLangtang: View {
     
 struct PopUp: View {
     
-    //@Binding var choice: Int
+    @Binding var choice: Int
     
     var body: some View {
-        DisplayText()
-        /*return Group {
+        //DisplayText()
+        return Group {
             if(choice == 1) {
-                HomeScreen()
+                //HomeScreen()
+                DisplayVideo(choice: $choice)
             }
             else if(choice == 2) {
                 DisplayText()//End ZStack
             }
-        }*/
+        }
     }
 }
 
-/*struct DisplayVideo: View {
+struct DisplayVideo: View {
     @Environment(\.presentationMode) var presentationMode
+    @Binding var choice: Int
     var body: some View {
         VStack {
+            VideoView(link:  findlocalDir(filename: returnVideoNo(row: choice, coloumname: "videoUrl")).absoluteString)
             Button(action: {
                 self.presentationMode.wrappedValue.dismiss()
             }) {
@@ -375,7 +401,7 @@ struct PopUp: View {
             }.padding(.bottom, 50)
         }
     }
-}*/
+}
 
 struct DisplayText: View {
     @Environment(\.presentationMode) var presentationMode

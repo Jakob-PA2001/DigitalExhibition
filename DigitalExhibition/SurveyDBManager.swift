@@ -106,7 +106,9 @@ class SurveyDBManager: NSObject {
             msg.append((product.value(forKeyPath: "gender") as? String)!)
             msg.append((product.value(forKeyPath: "nationality") as? String)!)
         }
-        print(msg)
+        if (msg.isEmpty) {
+            msg = []
+        }
         return msg
     }
     
@@ -121,39 +123,39 @@ class SurveyDBManager: NSObject {
         catch let error as NSError{
            print("Error While Retrieving from Core Data" + (error as! String) )
         }
-        
-        let url = URL(string: "https://pa2001.cdms.westernsydney.edu.au/addsurvey.php")
-        
-        var request = URLRequest(url: url!)
-        request.httpMethod = "POST"
-        
-        var dataString = "secretWord=pa2001" // starting POST string with a secretWord
-        // the POST string
-        
-        //var msg : [String] = []
-        for product in products {
-            dataString = dataString + "&a=\((product.value(forKeyPath: "gender") as? String)!)" // replace "username.txt with own declared variable.
-            dataString = dataString + "&b=\((product.value(forKeyPath: "age") as? String)!)" // replace "password.txt with own declared variable.
-            dataString = dataString + "&c=\((product.value(forKeyPath: "nationality") as? String)!)" // replace "password.txt with own declared variable.
-            let dataD = dataString.data(using: .utf8) // convert to utf8 string
+        if(!products.isEmpty) {
+            let url = URL(string: "https://pa2001.cdms.westernsydney.edu.au/addsurvey.php")
             
-            do
-            {
+            var request = URLRequest(url: url!)
+            request.httpMethod = "POST"
             
-                // EXECUTE POST REQUEST
-
-                let uploadJob = URLSession.shared.uploadTask(with: request, from: dataD)
+            var dataString = "secretWord=pa2001" // starting POST string with a secretWord
+            // the POST string
+            
+            //var msg : [String] = []
+            for product in products {
+                dataString = dataString + "&a=\((product.value(forKeyPath: "gender") as? String)!)" // replace "username.txt with own declared variable.
+                dataString = dataString + "&b=\((product.value(forKeyPath: "age") as? String)!)" // replace "password.txt with own declared variable.
+                dataString = dataString + "&c=\((product.value(forKeyPath: "nationality") as? String)!)" // replace "password.txt with own declared variable.
+                let dataD = dataString.data(using: .utf8) // convert to utf8 string
+                
+                do
                 {
-                    data, response, error in
-                    
-                   
+                
+                    // EXECUTE POST REQUEST
+
+                    let uploadJob = URLSession.shared.uploadTask(with: request, from: dataD)
+                    {
+                        data, response, error in
+                        
+                       
+                    }
+                    uploadJob.resume()
+                    dataString = "secretWord=pa2001"
                 }
-                uploadJob.resume()
-                dataString = "secretWord=pa2001"
             }
+            deleteAll()
         }
-        deleteAll()
-        
         // convert POST string to utf8 format
         
     }
@@ -166,24 +168,29 @@ class SurveyDBManager: NSObject {
     }
     
     func retrieveAttr() -> [SurveyDBManager.surveyAttr] {  // return array of Strings
-           guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-               return [surveyAttr(sid: "", age: "", gender: "", nationality: "")]}
-           let managedContext = appDelegate.persistentContainer.viewContext
-           let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Surveys")
-           do {
-               products  = try managedContext.fetch(fetchRequest)
-           }
-           catch let error as NSError{
-               print("Error While Retrieving from Core Data" + (error as! String) )
-           }
-           
-           var surveyList = [surveyAttr(sid: "Survey-Id", age: "Age", gender: "Gender", nationality: "Nationality")]
-           
+       guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+           return [surveyAttr(sid: "", age: "", gender: "", nationality: "")]}
+       let managedContext = appDelegate.persistentContainer.viewContext
+       let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Surveys")
+       do {
+           products  = try managedContext.fetch(fetchRequest)
+       }
+       catch let error as NSError{
+           print("Error While Retrieving from Core Data" + (error as! String) )
+       }
+       
+       var surveyList = [surveyAttr(sid: "Survey-Id", age: "Age", gender: "Gender", nationality: "Nationality")]
+        if(products.isEmpty) {
+            surveyList.append(surveyAttr(sid: " ", age: " ", gender: " ", nationality: " "))
+            
+        }
+        else {
            for product in products {
                
                surveyList.append(surveyAttr(sid: (product.value(forKeyPath: "sid") as? String)!, age: (product.value(forKeyPath: "age") as? String)!, gender: (product.value(forKeyPath: "gender") as? String)!, nationality: (product.value(forKeyPath: "nationality") as? String)!))
            }
-           return surveyList
+        }
+       return surveyList
     }
     
     //DELETES ALL SURVEY DATA
