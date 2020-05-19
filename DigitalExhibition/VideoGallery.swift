@@ -394,6 +394,7 @@ struct ShowDeleteView: View {
                 }
             }//Vstack
         }// End VStack
+        .offset(y: -50)
     }
     
     struct ConfirmDelete: View {

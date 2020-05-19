@@ -56,20 +56,11 @@ struct Survey: View {
     @State var gender = ""
     @State var age = ""
     @State var nationality = ""
+    @State var errMessage = ""
     
     var body: some View {
         VStack {
             HStack {
-                /*Button(action: {
-                    self.presentationMode.wrappedValue.dismiss()
-                }) {
-                    VStack {
-                        Text("Return")
-                        Image(systemName: "arrow.down")
-                        .font(.title)
-                    }
-                    .padding()
-                }.padding(.bottom, 50)*/
                 Spacer()
                 Button(action: {
                     if (self.login == false) {
@@ -82,32 +73,37 @@ struct Survey: View {
                 }
             }
             Section {
-                Text("Please in fill this short survey to view the exhibition:")
+                Text("Please fill in this short survey to view the exhibition:")
                     .font(.title)
+                Text(errMessage)
+                    .foregroundColor(Color.red)
             }
             VStack(alignment: .leading) {
                 Section {
                     Text("Age")
                         .font(.headline)
                     TextField("19, 20, 26..", text: self.$age)
-                        .padding(.all)
+                        .padding()
                         .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                        .cornerRadius(25)
                 }
                 .padding()
                 Section {
                     Text("Gender")
                         .font(.headline)
                     TextField("Male or Female", text: self.$gender)
-                        .padding(.all)
+                        .padding()
                         .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 0.5))
+                        .cornerRadius(25)
                 }
                 .padding()
                 Section {
                     Text("Nationality")
                         .font(.headline)
                     TextField("Australian, American, French, etc.", text: self.$nationality)
-                        .padding(.all)
-                        .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 0.5))
+                        .padding()
+                        .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                        .cornerRadius(25)
                 }
                 .padding()
             }
@@ -119,19 +115,38 @@ struct Survey: View {
                         self.nationality = ""
                     }) {
                         Text("Clear")
-                            .font(.title)
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                            .padding()
+                            .fixedSize()
+                            .frame(width: 140, height: 45)
+                            .foregroundColor(.white)
+                            .background(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0))
+                            .cornerRadius(8)
                         
                     }// End Button
                     .padding()
                     Button(action: {
-                        //self.save()
-                        if (self.completed == false) {
-                            self.completed = true
-                            
+                        if(self.age.isEmpty || self.gender.isEmpty || self.nationality.isEmpty) {
+                            self.errMessage = "Please fill in all the fields."
+                        }
+                        else {
+                            self.save()
+                            if (self.completed == false) {
+                                self.completed = true
+                                
+                            }
                         }
                     }) {
                         Text("Submit")
-                            .font(.title)
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                            .padding()
+                            .fixedSize()
+                            .frame(width: 140, height: 45)
+                            .foregroundColor(.white)
+                            .background(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0))
+                            .cornerRadius(8)
                         
                     }// End Button
                     .padding()
@@ -142,10 +157,6 @@ struct Survey: View {
             Spacer()
         }
 
-    }
-    func delete() {
-        let db = SurveyDBManager()
-        db.deleteAll()
     }
     func save() {
         let db = SurveyDBManager()

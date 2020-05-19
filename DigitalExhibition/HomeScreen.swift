@@ -37,50 +37,52 @@ struct HomeScreen: View {
                 Video3Information(displayPopup: $displayPopup, choice: $choice)
             }
             else {
-                VStack(/*alignment: .leading*/) {
+                ZStack {
                     Color(red: 66/255.0, green: 142/255.0, blue: 146/255.0, opacity: 1.0)
-                    VStack {
-                        // Exit Button
-                        HStack {
-                            Button(action: {
-                                if(self.finishViewing == false) {
-                                    self.finishViewing = true
+                    VStack(/*alignment: .leading*/) {
+                        VStack {
+                            // Exit Button
+                            HStack {
+                                Button(action: {
+                                    if(self.finishViewing == false) {
+                                        self.finishViewing = true
+                                    }
+                                }) {
+                                    Image(systemName: "arrow.left")
+                                    Text("Finish Viewing")
                                 }
-                            }) {
-                                Image(systemName: "arrow.left")
-                                Text("Finish Viewing")
+                                .foregroundColor(Color.black)
                             }
-                            .foregroundColor(Color.black)
-                        }
-                        .offset(y: 150)
-                        
-                        CirclesOfEmotion()
-                        .offset(x: 200, y: 300)
-                        
-                        // Earthquake video
-                        EarthquakeVideoButton(displayVideo: $displayVideo)
-                        .offset(x: -160, y: -100)
-                        
-                        //Video 1
-                        Video1Button(displayVideo1: $displayVideo1)
-                        .offset(x: -200, y: -100)
-                        
-                        //Video 2
-                        Video2Button(displayVideo2: $displayVideo2)
-                        .offset(x: -200, y: -100)
-                        
-                        //Video 3
-                        Video3Button(displayVideo3: $displayVideo3)
-                        .offset(x: -180, y: -100)
-                        
-                        //Langtang information
-                        AboutLangtang(displayPopup: $displayPopup, choice: $choice)
-                        .offset(x: 200, y: -200)
-                        
-                    }// End VStack
-                    .padding()
-                }// End ZStack
-                //.edgesIgnoringSafeArea(.top)
+                            .offset(y: 150)
+                            
+                            CirclesOfEmotion()
+                            .offset(x: 200, y: 300)
+                            
+                            // Earthquake video
+                            EarthquakeVideoButton(displayVideo: $displayVideo)
+                            .offset(x: -160, y: -100)
+                            
+                            //Video 1
+                            Video1Button(displayVideo1: $displayVideo1)
+                            .offset(x: -200, y: -100)
+                            
+                            //Video 2
+                            Video2Button(displayVideo2: $displayVideo2)
+                            .offset(x: -200, y: -100)
+                            
+                            //Video 3
+                            Video3Button(displayVideo3: $displayVideo3)
+                            .offset(x: -180, y: -100)
+                            
+                            //Langtang information
+                            AboutLangtang(displayPopup: $displayPopup, choice: $choice)
+                            .offset(x: 200, y: -200)
+                            
+                        }// End VStack
+                        .padding()
+                    }// End ZStack
+                    //.edgesIgnoringSafeArea(.top)
+                }
             }
         }
     }

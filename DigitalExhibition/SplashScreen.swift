@@ -28,7 +28,7 @@ struct Welcome: View {
     @Binding var canExplore: Bool
     
     var body: some View {
-        NavigationView {
+        //NavigationView {
             VStack {
                 HStack {
                     Image("fire.logo")
@@ -57,26 +57,25 @@ struct Welcome: View {
                         }
                         //self.displaySurvey = true
                     }) {
-                        VStack {
                             Text("EXPLORE")
-                                .font(.title)
-                                .fontWeight(.medium)
-                                .foregroundColor(Color.white)
-                                .multilineTextAlignment(.center)
-                        }
-                        .padding(.all, 5)
-                        .border(Color(red: 0/255.0, green: 131/255.0, blue: 143/255.0, opacity: 0.5), width: 2)
-                        .background(Color(red: 0/255.0, green: 131/255.0, blue: 143/255.0, opacity: 1.0))
-                        .cornerRadius(5.0)
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                                .padding()
+                                .fixedSize()
+                                .frame(width: 140, height: 45)
+                                .foregroundColor(.white)
+                                .background(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0))
+                                .cornerRadius(8)
                         
                     }
+                    .offset(y: 5)
                     /*.sheet(isPresented: self.$displaySurvey) {
                         SurveyScreen()
                     }*/
                 }
             }
-        }
-        .navigationViewStyle(StackNavigationViewStyle())
+        //}
+        //.navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
