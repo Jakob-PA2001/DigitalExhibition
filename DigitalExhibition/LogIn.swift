@@ -86,7 +86,7 @@ struct LoginForm: View {
                     Text("Username")
                         .font(.headline)
                         .padding(.bottom, -20)
-                    TextField("Usrname...", text: self.$username)
+                    TextField("Username...", text: self.$username)
                         .padding()
                         .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 0.5))
                         .cornerRadius(25)

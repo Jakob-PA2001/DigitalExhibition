@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		84010A322474E011005E006C /* NetStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84010A312474E011005E006C /* NetStatus.swift */; };
 		840A7AA9246E64C500FB03AE /* TestScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840A7AA8246E64C500FB03AE /* TestScreen.swift */; };
 		8419BC062472705600CDA74A /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8419BC052472705600CDA74A /* VideoView.swift */; };
 		8419BC082472707400CDA74A /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8419BC072472707300CDA74A /* Utility.swift */; };
@@ -26,6 +27,7 @@
 		848C7A83245955A0000C4017 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 848C7A81245955A0000C4017 /* LaunchScreen.storyboard */; };
 		848C7A8E245955A0000C4017 /* DigitalExhibitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848C7A8D245955A0000C4017 /* DigitalExhibitionTests.swift */; };
 		848C7A99245955A0000C4017 /* DigitalExhibitionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848C7A98245955A0000C4017 /* DigitalExhibitionUITests.swift */; };
+		84D4B006247414FF006134D8 /* OnlineUserDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D4B005247414FF006134D8 /* OnlineUserDB.swift */; };
 		84FBE6AF2469031000F7DDFC /* DigitalExhibition.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 84FBE6AD2469031000F7DDFC /* DigitalExhibition.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
@@ -47,6 +49,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		84010A312474E011005E006C /* NetStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetStatus.swift; sourceTree = "<group>"; };
 		840A7AA8246E64C500FB03AE /* TestScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestScreen.swift; sourceTree = "<group>"; };
 		8419BC052472705600CDA74A /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		8419BC072472707300CDA74A /* Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
@@ -72,6 +75,7 @@
 		848C7A94245955A0000C4017 /* DigitalExhibitionUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DigitalExhibitionUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		848C7A98245955A0000C4017 /* DigitalExhibitionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DigitalExhibitionUITests.swift; sourceTree = "<group>"; };
 		848C7A9A245955A0000C4017 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		84D4B005247414FF006134D8 /* OnlineUserDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineUserDB.swift; sourceTree = "<group>"; };
 		84FBE6AE2469031000F7DDFC /* DigitalExhibition.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DigitalExhibition.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -126,7 +130,9 @@
 				848C7A762459559E000C4017 /* AppDelegate.swift */,
 				84FBE6AD2469031000F7DDFC /* DigitalExhibition.xcdatamodeld */,
 				8419BC0B247275A300CDA74A /* SurveyDBManager.swift */,
+				84010A312474E011005E006C /* NetStatus.swift */,
 				848BD4882473A3FA00BB7795 /* UserDBManager.swift */,
+				84D4B005247414FF006134D8 /* OnlineUserDB.swift */,
 				848C7A782459559E000C4017 /* SceneDelegate.swift */,
 				848C7A7A2459559E000C4017 /* ContentView.swift */,
 				841EC9C9245FF842007D6D3D /* SplashScreen.swift */,
@@ -310,9 +316,11 @@
 				841EC9D02460027E007D6D3D /* LogIn.swift in Sources */,
 				842219A9246148440079241B /* VideoGallery.swift in Sources */,
 				8419BC0A2472708500CDA74A /* DatabaseMethod.swift in Sources */,
+				84D4B006247414FF006134D8 /* OnlineUserDB.swift in Sources */,
 				8419BC082472707400CDA74A /* Utility.swift in Sources */,
 				848C7A792459559E000C4017 /* SceneDelegate.swift in Sources */,
 				84FBE6AF2469031000F7DDFC /* DigitalExhibition.xcdatamodeld in Sources */,
+				84010A322474E011005E006C /* NetStatus.swift in Sources */,
 				840A7AA9246E64C500FB03AE /* TestScreen.swift in Sources */,
 				848C7A7B2459559E000C4017 /* ContentView.swift in Sources */,
 				841EC9CC245FF86E007D6D3D /* SurveyScreen.swift in Sources */,

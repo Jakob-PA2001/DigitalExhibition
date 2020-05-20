@@ -8,6 +8,7 @@
 
 import SwiftUI
 import AVFoundation
+import QuickLookThumbnailing
 
 // This is the UIView that contains the AVPlayerLayer for rendering the video
 class VideoPlayerUIView: UIView {

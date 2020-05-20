@@ -166,9 +166,12 @@ class UserDBManager: NSObject {
             
             var dataString = "secretWord=pa2001" // starting POST string with a secretWord
             // the POST string
+
+            var msg : [String] = []
             
             for product in products {
-                dataString = dataString + "&a=\((product.value(forKeyPath: "username") as? String)!)" // replace "username.txt with own declared variable.
+                msg.append((product.value(forKeyPath: "username") as? String)!)
+                /*dataString = dataString + "&a=\((product.value(forKeyPath: "username") as? String)!)" // replace "username.txt with own declared variable.
                 dataString = dataString + "&b=\((product.value(forKeyPath: "password") as? String)!)" // replace "password.txt with own declared variable.
                 let dataD = dataString.data(using: .utf8) // convert to utf8 string
                 
@@ -185,11 +188,24 @@ class UserDBManager: NSObject {
                     }
                     uploadJob.resume()
                     dataString = "secretWord=pa2001"
-                }
-            }
+                }*/
+            }//for
+            
+            //let onlineUsernames = OnlineUserDB().DownloadUsers()
+            //let difference = onlineUsernames.difference(from: msg)
+            //print(onlineUsernames)
+            //print("Dif: \(difference)")
+            //print(msg)
         }
         // convert POST string to utf8 format
         
     }
-    
+}
+
+extension Array where Element: Hashable {
+    func difference(from other: [Element]) -> [Element] {
+        let thisSet = Set(self)
+        let otherSet = Set(other)
+        return Array(thisSet.symmetricDifference(otherSet))
+    }
 }

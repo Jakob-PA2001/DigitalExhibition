@@ -42,7 +42,7 @@ struct Welcome: View {
                         .padding()
                 }
                 .padding(.top, -620)
-                .offset(y: 250)
+                .offset(y: 260)
                 Image("splash")
                     .resizable()
                     .padding(.top, -620)

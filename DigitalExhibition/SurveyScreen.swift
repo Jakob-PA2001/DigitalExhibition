@@ -16,6 +16,7 @@ struct SurveyScreen: View {
     
     @State var completed = false
     @State var login = false
+    @State var goBack = false
     
     var body: some View {
         return Group {
@@ -25,11 +26,11 @@ struct SurveyScreen: View {
             else if (login) {
                 LogIn()
             }
-            else if (maxTime == 0) {
+            else if (maxTime == 0 || goBack) {
                 SplashScreen()
             }
             else {
-                Survey(completed: $completed, login: $login)
+                Survey(completed: $completed, login: $login, goBack: $goBack)
             }
             
             /* Waits 2 minutes before returning to splash screen.
@@ -52,6 +53,7 @@ struct Survey: View {
     
     @Binding var completed: Bool
     @Binding var login: Bool
+    @Binding var goBack: Bool
     
     @State var gender = ""
     @State var age = ""
@@ -59,8 +61,19 @@ struct Survey: View {
     @State var errMessage = ""
     
     var body: some View {
+        
         VStack {
             HStack {
+                Button(action: {
+                    if (self.goBack == false) {
+                        self.goBack = true
+                    }
+                }) {
+                    Image(systemName: "chevron.left")
+                    .padding()
+                    .font(.title)
+                    .foregroundColor(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0))
+                }
                 Spacer()
                 Button(action: {
                     if (self.login == false) {
@@ -69,7 +82,7 @@ struct Survey: View {
                 }) {
                     Image(systemName: "person.circle.fill")
                     .padding()
-                        .font(.title)
+                    .font(.title)
                 }
             }
             Section {
