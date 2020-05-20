@@ -43,7 +43,6 @@ struct LoginForm: View {
     
     @State var username = ""
     @State var password = ""
-    @State var hidePass: Bool = false
     
     @State var dummy_user = "Admin"
     @State var dummy_pass = "PA2001"
@@ -86,8 +85,9 @@ struct LoginForm: View {
                 Section {
                     Text("Username")
                         .font(.headline)
+                        .padding(.bottom, -20)
                     TextField("Username...", text: self.$username)
-                        .padding(.all)
+                        .padding()
                         .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 0.5))
                         .cornerRadius(25)
                 }
@@ -95,61 +95,50 @@ struct LoginForm: View {
                 Section {
                     Text("Password")
                         .font(.headline)
-                    ZStack {
-                        HStack {
-                            if self.hidePass {
-                            TextField("Password...", text: self.$password)
-                                .padding(.all)
-                                .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 0.5))
-                                .cornerRadius(25)
-                            } else {
-                            SecureField("Password...", text: self.$password)
-                                .padding(.all)
-                                .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 0.5))
-                                .cornerRadius(25)
-                            }
-                            Button(action: {self.hidePass.toggle()}) {
-                                Image(systemName: self.hidePass ? "eye.fill":"eye.slash.fill")
-                                    .foregroundColor((self.hidePass == true) ? Color.green : Color.secondary)
-                            }.offset(x: -45)
-                        }// End HStack
-                    }// End ZStack
+                        .padding(.bottom, -20)
+                    SecureField("Password...", text: self.$password)
+                        .padding()
+                        .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                        .cornerRadius(25)
                 }
                 .padding()
                 Section {
                     HStack {
                         Spacer()
                         Button(action: {
-                               //  addusers()
-                                 self.displayError = false
-                                 if (showuserDatabase()==false){
-                                     print("Database is empty")
-                                     errormessage = "Syncing ,user database empty, please try again in a few moments!"
-                                     syncUserzDatabase()
-                                     self.displayError = true
-                                 }else{
+                       
+                                                    
+                        
+                          //  addusers()
+                            self.displayError = false
+                            if (showuserDatabase()==false){
+                                print("Database is empty")
+                                errormessage = "Syncing ,user database empty, please try again in a few moments!"
+                                syncUserzDatabase()
+                                self.displayError = true
+                            }else{
 
-                                    // getTableSize(tablename: "users")
-                                     if (authenticate(USERNAME: self.username, PASSWORD: self.password) == true ){
+                               // getTableSize(tablename: "users")
+                                if (authenticate(USERNAME: self.username, PASSWORD: self.password) == true ){
 
-                                         
-                                        self.canSignIn = true
-                                       
-                                     }else{
-                                         errormessage = "Incorrect Username/Password"
-                                     }
-                                       self.displayError = true
-                                 }
+                                    
+                                   self.canSignIn = true
+                                  
+                                }else{
+                                    errormessage = "Incorrect Username/Password"
+                                }
+                                  self.displayError = true
+                            }
                         }) {
                             Text("Sign in")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .padding()
-                                .fixedSize()
-                                .frame(width: 140, height: 45)
-                                .foregroundColor(.white)
-                                .background(Color.black)
-                                .cornerRadius(8)
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                            .padding()
+                            .fixedSize()
+                            .frame(width: 140, height: 45)
+                            .foregroundColor(.white)
+                            .background(Color.black)
+                            .cornerRadius(8)
                         }  //end of button funct
                         Spacer()
                     }
@@ -161,9 +150,6 @@ struct LoginForm: View {
         
     }
 }
-
-
-
 
 
 
@@ -222,9 +208,9 @@ func syncUserzDatabase(){
                            let password:String = ((teams[i] as! NSDictionary)["password"] as! String?)!
                          //  print(username + " added")
                           insertIntoUsers(username: username, password: password)
-                           
                        }
                        
+                   
                            } catch {
                                    print(error)
                            } //doend

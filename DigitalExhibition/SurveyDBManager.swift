@@ -9,6 +9,7 @@
 import SwiftUI
 import Foundation
 import CoreData
+import Network
 
 class SurveyDBManager: NSObject {
     
@@ -123,6 +124,7 @@ class SurveyDBManager: NSObject {
         catch let error as NSError{
            print("Error While Retrieving from Core Data" + (error as! String) )
         }
+        
         if(!products.isEmpty) {
             let url = URL(string: "https://pa2001.cdms.westernsydney.edu.au/addsurvey.php")
             

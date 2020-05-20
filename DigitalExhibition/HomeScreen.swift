@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 struct HomeScreen: View {
     @State private var displayPopup: Bool = false
@@ -28,70 +29,148 @@ struct HomeScreen: View {
                 EarthquakeVideoInformation(displayPopup: $displayPopup, choice: $choice)
             }
             else if(displayVideo1) {
-                Video1Information()
+                Video1Information(displayPopup: $displayPopup, choice: $choice)
             }
             else if(displayVideo2) {
-                Video2Information()
+                Video2Information(displayPopup: $displayPopup, choice: $choice)
             }
             else if(displayVideo3) {
-                Video3Information()
+                Video3Information(displayPopup: $displayPopup, choice: $choice)
             }
             else {
-                VStack(/*alignment: .leading*/) {
+                ZStack {
                     Color(red: 66/255.0, green: 142/255.0, blue: 146/255.0, opacity: 1.0)
-                    VStack {
-                        // Exit Button
-                        HStack {
-                            Button(action: {
-                                if(self.finishViewing == false) {
-                                    self.finishViewing = true
+                    VStack(/*alignment: .leading*/) {
+                        VStack {
+                            // Exit Button
+                            HStack(alignment: .center) {
+                                Button(action: {
+                                    if(self.finishViewing == false) {
+                                        self.finishViewing = true
+                                    }
+                                }) {
+                                    Image(systemName: "arrow.left")
+                                    Text("Finish Viewing")
                                 }
-                            }) {
-                                Image(systemName: "arrow.left")
-                                Text("Finish Viewing")
+                                .padding()
+                                .fixedSize()
+                                .frame(width: 250, height: 45)
+                                .foregroundColor(.white)
+                                .background(Color(red: 38/255.0, green: 50/255.0, blue: 56/255.0, opacity: 1.0))
+                                .cornerRadius(25)
+                                .offset(x: 43, y: -13)
                             }
-                            .foregroundColor(Color.black)
-                        }
-                        .offset(y: 150)
-                        
-                        CirclesOfEmotion()
-                        .offset(x: 200, y: 300)
-                        
-                        // Earthquake video
-                        EarthquakeVideoButton(/*displayPopup: $displayPopup, choice: $choice,*/ displayVideo: $displayVideo)
-                        .offset(x: -160, y: -100)
-                        
-                        //Video 1
-                        Video1Button(displayVideo1: $displayVideo1, choice: $choice)
-                        .offset(x: -200, y: -100)
-                        
-                        //Video 2
-                        Video2Button(displayVideo2: $displayVideo2, choice: $choice)
-                        .offset(x: -200, y: -100)
-                        
-                        //Video 3
-                        Video3Button(displayVideo3: $displayVideo3, choice: $choice)
-                        .offset(x: -180, y: -100)
-                        
-                        //Langtang information
-                        AboutLangtang(displayPopup: $displayPopup, choice: $choice)
-                        .offset(x: 200, y: -200)
-                        
-                    }// End VStack
-                    .padding()
-                }// End ZStack
-                //.edgesIgnoringSafeArea(.top)
+                            .offset(y: 150)
+                            
+                            CirclesOfEmotion(radius: 200, text: "Take the Circles of Emotion quiz!")
+                            .offset(x: 280, y: 300)
+                            
+                            // Earthquake video
+                            EarthquakeVideoButton(displayVideo: $displayVideo)
+                            .offset(x: -150, y: -100)
+                            
+                            //Video 1
+                            Video1Button(displayVideo1: $displayVideo1)
+                            .offset(x: -220, y: -100)
+                            
+                            //Video 2
+                            Video2Button(displayVideo2: $displayVideo2)
+                            .offset(x: -220, y: -100)
+                            
+                            //Video 3
+                            Video3Button(displayVideo3: $displayVideo3)
+                            .offset(x: -170, y: -100)
+                            
+                            //Langtang information
+                            AboutLangtang(displayPopup: $displayPopup, choice: $choice)
+                            .offset(x: 280, y: -200)
+                            
+                        }// End VStack
+                        .padding()
+                    }// End ZStack
+                    //.edgesIgnoringSafeArea(.top)
+                }
             }
         }
     }
 }
+
+
 
 struct EarthquakeVideoInformation: View {
     @Binding var displayPopup: Bool
     @Binding var choice: Int
     @State var goBack: Bool = false
     @State var tovideo: Bool = false
-    
+    var body: some View {
+        return Group {
+            if(self.goBack) {
+                HomeScreen()
+            }
+            else {
+                ZStack {
+                    LinearGradient(gradient: Gradient(colors: [Color.white, Color(red: 46/255.0, green: 125/255.0, blue: 50/255.0, opacity: 1.0)]), startPoint: .top, endPoint: .bottom)
+                    VStack {
+                        Button(action: {
+                            if(self.goBack == false) {
+                                self.goBack = true
+                            }
+                        }){
+                            HStack {
+                                Image(systemName: "arrow.left")
+                                Text("Return To Exhibition")
+                            }
+                        }
+                        //.font(.headline)
+                        //.fontWeight(.semibold)
+                        .padding()
+                        .fixedSize()
+                        .frame(width: 250, height: 45)
+                        .foregroundColor(.white)
+                        .background(Color(red: 38/255.0, green: 50/255.0, blue: 56/255.0, opacity: 1.0))
+                        .cornerRadius(25)
+                        Spacer()
+
+                        VStack{
+                            Button(action: {
+                                //self.tovideo = true
+                                self.displayPopup = true
+                                self.choice = 1
+                                  
+                            }) {
+                                HStack(alignment: .center, spacing: 5.0) {
+                                Image("preview.1").clipShape(Circle()).overlay(Circle().stroke(Color.orange, lineWidth:4) ).shadow(radius: 10)
+                                Image(systemName: "play")
+                                    .font(.title)
+                                    .foregroundColor(Color.white)
+                                    .offset(x: -85)
+                                }
+                            }.sheet(isPresented: self.$displayPopup) {
+                                PopUp(choice: self.$choice)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                          
+                          Text(returnVideoNo(row: 1, coloumname: "videoname")).font(.title)
+                          Text(returnVideoNo(row: 1, coloumname: "description"))
+                          .multilineTextAlignment(.center)
+                          .lineSpacing(10)
+                          .foregroundColor(Color.black)
+                          .font(.headline)
+                          .padding()
+                          
+                        }
+                        Spacer()
+                    }
+                }
+            }//End if-else
+        }// End Group
+    }
+}
+
+struct Video1Information: View {
+    @Binding var displayPopup: Bool
+    @Binding var choice: Int
+    @State var goBack: Bool = false
     var body: some View {
         return Group {
             if(self.goBack) {
@@ -104,8 +183,19 @@ struct EarthquakeVideoInformation: View {
                             self.goBack = true
                         }
                     }){
-                        Text("Return Home")
+                        HStack {
+                            Image(systemName: "arrow.left")
+                            Text("Return To Exhibition")
+                        }
+                        
                     }
+                    .padding()
+                    .fixedSize()
+                    .frame(width: 250, height: 45)
+                    .foregroundColor(.white)
+                    .background(Color(red: 38/255.0, green: 50/255.0, blue: 56/255.0, opacity: 1.0))
+                    .cornerRadius(25)
+                    Spacer()
 
                     VStack{
                         Button(action: {
@@ -116,43 +206,35 @@ struct EarthquakeVideoInformation: View {
                         }) {
                             HStack(alignment: .center, spacing: 5.0) {
                             Image("preview.1").clipShape(Circle()).overlay(Circle().stroke(Color.orange, lineWidth:4) ).shadow(radius: 10)
+                            Image(systemName: "play")
+                                .font(.title)
+                                .foregroundColor(Color.white)
+                                .offset(x: -85)
                             }
                         }.sheet(isPresented: self.$displayPopup) {
                             PopUp(choice: self.$choice)
                         }
+                        .buttonStyle(PlainButtonStyle())
                       
                       Text(returnVideoNo(row: 1, coloumname: "videoname")).font(.title)
                       Text(returnVideoNo(row: 1, coloumname: "description"))
+                      .multilineTextAlignment(.center)
+                      .lineSpacing(10)
+                      .foregroundColor(Color.black)
+                      .font(.headline)
+                      .padding()
                       
                     }
+                    Spacer()
                 }
             }//End if-else
         }// End Group
     }
 }
 
-struct Video1Information: View {
-    @State var goBack: Bool = false
-    var body: some View {
-        return Group {
-            if(self.goBack) {
-                HomeScreen()
-            }
-            else {
-                Button(action: {
-                    if(self.goBack == false) {
-                        self.goBack = true
-                    }
-                }){
-                    Text("Return Home")
-                }
-                Text("Vid 1 text and vid link")
-            }
-        }
-    }
-}
-
 struct Video2Information: View {
+    @Binding var displayPopup: Bool
+    @Binding var choice: Int
     @State var goBack: Bool = false
     var body: some View {
         return Group {
@@ -160,20 +242,63 @@ struct Video2Information: View {
                 HomeScreen()
             }
             else {
-                Button(action: {
-                    if(self.goBack == false) {
-                        self.goBack = true
+                VStack {
+                    Button(action: {
+                        if(self.goBack == false) {
+                            self.goBack = true
+                        }
+                    }){
+                        HStack {
+                            Image(systemName: "arrow.left")
+                            Text("Return To Exhibition")
+                        }
                     }
-                }){
-                    Text("Return Home")
+                    .padding()
+                    .fixedSize()
+                    .frame(width: 250, height: 45)
+                    .foregroundColor(.white)
+                    .background(Color(red: 38/255.0, green: 50/255.0, blue: 56/255.0, opacity: 1.0))
+                    .cornerRadius(25)
+                    Spacer()
+
+                    VStack{
+                        Button(action: {
+                            //self.tovideo = true
+                            self.displayPopup = true
+                            self.choice = 2
+                              
+                        }) {
+                            HStack(alignment: .center, spacing: 5.0) {
+                            Image("preview.1").clipShape(Circle()).overlay(Circle().stroke(Color.orange, lineWidth:4) ).shadow(radius: 10)
+                            Image(systemName: "play")
+                                .font(.title)
+                                .foregroundColor(Color.white)
+                                .offset(x: -85)
+                            }
+                        }.sheet(isPresented: self.$displayPopup) {
+                            PopUp(choice: self.$choice)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                      
+                      Text(returnVideoNo(row: 2, coloumname: "videoname")).font(.title)
+                      Text(returnVideoNo(row: 2, coloumname: "description"))
+                      .multilineTextAlignment(.center)
+                      .lineSpacing(10)
+                      .foregroundColor(Color.black)
+                      .font(.headline)
+                      .padding()
+                      
+                    }
+                    Spacer()
                 }
-                Text("Vid 2 Text and vid link")
-            }
-        }
+            }//End if-else
+        }// End Group
     }
 }
 
 struct Video3Information: View {
+    @Binding var displayPopup: Bool
+    @Binding var choice: Int
     @State var goBack: Bool = false
     var body: some View {
         return Group {
@@ -181,153 +306,115 @@ struct Video3Information: View {
                 HomeScreen()
             }
             else {
-                Button(action: {
-                    if(self.goBack == false) {
-                        self.goBack = true
+                VStack {
+                    Button(action: {
+                        if(self.goBack == false) {
+                            self.goBack = true
+                        }
+                    }){
+                        HStack {
+                            Image(systemName: "arrow.left")
+                            Text("Return To Exhibition")
+                        }
                     }
-                }){
-                    Text("Return Home")
-                }
-                Text("Vid 3 Text and vid link")
-            }
-        }
-    }
-}
+                    .padding()
+                    .fixedSize()
+                    .frame(width: 250, height: 45)
+                    .foregroundColor(.white)
+                    .background(Color(red: 38/255.0, green: 50/255.0, blue: 56/255.0, opacity: 1.0))
+                    .cornerRadius(25)
+                    Spacer()
 
-struct EarthquakeVideoButton: View {
-    
-    //@Binding var displayPopup: Bool
-    @Binding var displayVideo: Bool
-    //@Binding var choice: Int
-    
-    var body: some View {
-        Group {
-            Button(action: {
-                if(self.displayVideo == false) {
-                    self.displayVideo = true
+                    VStack{
+                        Button(action: {
+                            //self.tovideo = true
+                            self.displayPopup = true
+                            self.choice = 3
+                              
+                        }) {
+                            HStack(alignment: .center, spacing: 5.0) {
+                            Image("preview.1").clipShape(Circle()).overlay(Circle().stroke(Color.orange, lineWidth:4) ).shadow(radius: 10)
+                            Image(systemName: "play")
+                                .font(.title)
+                                .foregroundColor(Color.white)
+                                .offset(x: -85)
+                            }
+                        }.sheet(isPresented: self.$displayPopup) {
+                            PopUp(choice: self.$choice)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                      
+                      Text(returnVideoNo(row: 3, coloumname: "videoname")).font(.title)
+                      Text(returnVideoNo(row: 3, coloumname: "description"))
+                      .multilineTextAlignment(.center)
+                      .lineSpacing(10)
+                      .foregroundColor(Color.black)
+                      .font(.headline)
+                      .padding()
+                      
+                    }
+                    Spacer()
                 }
-                //self.displayPopup = true
-                //self.choice = 1
-            }) {
-                HStack {
-                    Image("preview.4")
-                        .clipShape(Circle())
-                        .overlay(
-                            Circle().stroke(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0), lineWidth: 4))
-                        .shadow(radius: 10)
-                    Text("What to do in the event of an earthquake")
-                }
-            }// End button
-                //.sheet(isPresented: self.$displayPopup) {
-                    //PopUp(choice: self.$choice)
-            //}
-            .buttonStyle(PlainButtonStyle())
-        }
-    }
-}
-
-struct Video1Button: View {
-    
-    @Binding var displayVideo1: Bool
-    @Binding var choice: Int
-    
-    var body: some View {
-        Group {
-            Button(action: {
-                if(self.displayVideo1 == false) {
-                    self.displayVideo1 = true
-                }
-                //self.displayPopup = true
-                //self.choice = 1
-            }) {
-                HStack {
-                    Image("preview.1")
-                        .clipShape(Circle())
-                        .overlay(
-                            Circle().stroke(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0), lineWidth: 4))
-                        .shadow(radius: 10)
-                    Text("Stories from Langtang")
-                }
-            }// End button
-                //.sheet(isPresented: self.$displayPopup) {
-                    //PopUp(choice: self.$choice)
-            //}
-            .buttonStyle(PlainButtonStyle())
-        }
-    }
-}
-
-struct Video2Button: View {
-    
-    @Binding var displayVideo2: Bool
-    @Binding var choice: Int
-    
-    var body: some View {
-        Group {
-            Button(action: {
-                if(self.displayVideo2 == false) {
-                    self.displayVideo2 = true
-                }
-                //self.displayPopup = true
-                //self.choice = 1
-            }) {
-                HStack {
-                    Image("preview.2")
-                        .clipShape(Circle())
-                        .overlay(
-                            Circle().stroke(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0), lineWidth: 4))
-                        .shadow(radius: 10)
-                    Text("Stories from Langtang")
-                }
-            }// End button
-                //.sheet(isPresented: self.$displayPopup) {
-                    //PopUp(choice: self.$choice)
-            //}
-            .buttonStyle(PlainButtonStyle())
-        }
-    }
-}
-
-struct Video3Button: View {
-    
-    @Binding var displayVideo3: Bool
-    @Binding var choice: Int
-    
-    var body: some View {
-        Group {
-            Button(action: {
-                if(self.displayVideo3 == false) {
-                    self.displayVideo3 = true
-                }
-                //self.displayPopup = true
-                //self.choice = 1
-            }) {
-                HStack {
-                    Image("preview.3")
-                        .clipShape(Circle())
-                        .overlay(
-                            Circle().stroke(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0), lineWidth: 4))
-                        .shadow(radius: 10)
-                    Text("Stories from Langtang")
-                }
-            }// End button
-                //.sheet(isPresented: self.$displayPopup) {
-                    //PopUp(choice: self.$choice)
-            //}
-            .buttonStyle(PlainButtonStyle())
-        }
+            }//End if-else
+        }// End Group
     }
 }
 
 struct CirclesOfEmotion: View {
+    var radius: Double
+    var text: String
+    var kerning: CGFloat = 5.0
+    
+    private var texts: [(offset: Int, element:Character)] {
+        return Array(text.enumerated())
+    }
+    
+    @State var textSizes: [Int:Double] = [:]
+    
     var body: some View {
         Group {
             Button(action: {self.RedirectQuiz()}) {
-                VStack {
-                    Text("Take the circles of emotion quiz!")
+
+                    ZStack {
+                        ForEach(self.texts, id: \.self.offset) { (offset, element) in
+                            VStack {
+                                Text(String(element))
+                                    .kerning(self.kerning)
+                                    .background(Sizeable())
+                                    .onPreferenceChange(WidthPreferenceKey.self, perform: { size in
+                                        self.textSizes[offset] = Double(size)
+                                    })
+                                Spacer()
+                            }
+                            .rotationEffect(self.angle(at: offset))
+                            
+                        }
+                        
+                        Image("circle")
+                            .shadow(radius: 10)
+                            .rotationEffect(.degrees(60))
+                            .offset(x: -22, y: 15)
+                    }.rotationEffect(-self.angle(at: self.texts.count-1)/2)
+                        
+                    .frame(width: 300, height: 300, alignment: .center)
+                //}
+        
+                /*VStack {
+                    Text("Take")
+                        .rotationEffect(.degrees(-10))
+                        .offset(x: -75, y:50)
+                    Text("the")
+                        .rotationEffect(.degrees(-5))
+                        .offset(x: -75, y:50)
+                    Text("circles of")
+                        .rotationEffect(.degrees(0))
+                        .offset(x: -5, y: 20)
+                    Text("emotion quiz!")
+                        .rotationEffect(.degrees(15))
+                        .offset(x: 85, y:12)
                     Image("circle")
                         .shadow(radius: 10)
-                }
+                }*/
             }// End button
             .buttonStyle(PlainButtonStyle())
         }
@@ -338,6 +425,43 @@ struct CirclesOfEmotion: View {
             UIApplication.shared.open(url)
         }
     }// End func
+    
+    private func angle(at index: Int) -> Angle {
+        guard let labelSize = textSizes[index] else {return .radians(0)}
+        let percentOfLabelInCircle = labelSize / radius.perimeter
+        let labelAngle = 2 * Double.pi * percentOfLabelInCircle
+        
+        
+        let totalSizeOfPreChars = textSizes.filter{$0.key < index}.map{$0.value}.reduce(0,+)
+        let percenOfPreCharInCircle = totalSizeOfPreChars / radius.perimeter
+        let angleForPreChars = 2 * Double.pi * percenOfPreCharInCircle
+        
+        return .radians(angleForPreChars + labelAngle)
+    }
+}
+
+extension Double {
+    var perimeter: Double {
+        return self * 2 * .pi
+    }
+}
+
+
+//Get size for label helper
+struct WidthPreferenceKey: PreferenceKey {
+    typealias Value = CGFloat
+    static var defaultValue = CGFloat(0)
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+struct Sizeable: View {
+    var body: some View {
+        GeometryReader { geometry in
+            Color.clear
+                .preference(key: WidthPreferenceKey.self, value: geometry.size.width)
+        }
+    }
 }
 
 struct AboutLangtang: View {
@@ -349,18 +473,21 @@ struct AboutLangtang: View {
         Group {
             Button(action: {
                 self.displayPopup = true
-                self.choice = 2
+                self.choice = 5
             }) {
                 HStack {
                     Image("heritage")
                         .shadow(radius: 10)
+                        .offset(y: -10)
                     Text("About The Langtang Heritage Trail")
+                        .offset(x: -20, y: 0)
                 }
             }// End button
                 .sheet(isPresented: self.$displayPopup) {
                     PopUp(choice: self.$choice)
             }
             .buttonStyle(PlainButtonStyle())
+            .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(red: 0/255.0, green: 76/255.0, blue: 64/255.0, opacity: 1.0), lineWidth: 3))
         }
     }
 }
@@ -372,11 +499,11 @@ struct PopUp: View {
     var body: some View {
         //DisplayText()
         return Group {
-            if(choice == 1) {
+            if(choice != 5) {
                 //HomeScreen()
                 DisplayVideo(choice: $choice)
             }
-            else if(choice == 2) {
+            else if(choice == 5) {
                 DisplayText()//End ZStack
             }
         }
@@ -446,6 +573,133 @@ struct DisplayText: View {
         }
     }
 }
+
+
+struct EarthquakeVideoButton: View {
+    
+    //@Binding var displayPopup: Bool
+    @Binding var displayVideo: Bool
+    //@Binding var choice: Int
+    
+    var body: some View {
+        Group {
+            Button(action: {
+                if(self.displayVideo == false) {
+                    self.displayVideo = true
+                }
+                //self.displayPopup = true
+                //self.choice = 1
+            }) {
+                HStack {
+                    Image("preview.4")
+                        .clipShape(Circle())
+                        .overlay(
+                            Circle().stroke(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0), lineWidth: 4))
+                        .shadow(radius: 10)
+                    Text("What to do in the event of an earthquake")
+                }
+            }// End button
+                //.sheet(isPresented: self.$displayPopup) {
+                    //PopUp(choice: self.$choice)
+            //}
+            .buttonStyle(PlainButtonStyle())
+        }
+    }
+}
+
+struct Video1Button: View {
+    
+    @Binding var displayVideo1: Bool
+    //@Binding var choice: Int
+    
+    var body: some View {
+        Group {
+            Button(action: {
+                if(self.displayVideo1 == false) {
+                    self.displayVideo1 = true
+                }
+                //self.displayPopup = true
+                //self.choice = 1
+            }) {
+                HStack {
+                    Image("preview.1")
+                        .clipShape(Circle())
+                        .overlay(
+                            Circle().stroke(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0), lineWidth: 4))
+                        .shadow(radius: 10)
+                    Text("Stories from Langtang")
+                }
+            }// End button
+                //.sheet(isPresented: self.$displayPopup) {
+                    //PopUp(choice: self.$choice)
+            //}
+            .buttonStyle(PlainButtonStyle())
+        }
+    }
+}
+
+struct Video2Button: View {
+    
+    @Binding var displayVideo2: Bool
+    //@Binding var choice: Int
+    
+    var body: some View {
+        Group {
+            Button(action: {
+                if(self.displayVideo2 == false) {
+                    self.displayVideo2 = true
+                }
+                //self.displayPopup = true
+                //self.choice = 1
+            }) {
+                HStack {
+                    Image("preview.2")
+                        .clipShape(Circle())
+                        .overlay(
+                            Circle().stroke(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0), lineWidth: 4))
+                        .shadow(radius: 10)
+                    Text("Stories from Langtang")
+                }
+            }// End button
+                //.sheet(isPresented: self.$displayPopup) {
+                    //PopUp(choice: self.$choice)
+            //}
+            .buttonStyle(PlainButtonStyle())
+        }
+    }
+}
+
+struct Video3Button: View {
+    
+    @Binding var displayVideo3: Bool
+    //@Binding var choice: Int
+    
+    var body: some View {
+        Group {
+            Button(action: {
+                if(self.displayVideo3 == false) {
+                    self.displayVideo3 = true
+                }
+                //self.displayPopup = true
+                //self.choice = 1
+            }) {
+                HStack {
+                    Image("preview.3")
+                        .clipShape(Circle())
+                        .overlay(
+                            Circle().stroke(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0), lineWidth: 4))
+                        .shadow(radius: 10)
+                    Text("Stories from Langtang")
+                }
+            }// End button
+                //.sheet(isPresented: self.$displayPopup) {
+                    //PopUp(choice: self.$choice)
+            //}
+            .buttonStyle(PlainButtonStyle())
+        }
+    }
+}
+
 
 struct HomeScreen_Previews: PreviewProvider {
     static var previews: some View {

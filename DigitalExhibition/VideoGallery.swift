@@ -88,6 +88,7 @@ struct Menu: View {
     }
 }
 
+
 struct videoAttributes {
   let videoname: String
   let description: String
@@ -114,9 +115,12 @@ func addvideos(){
                 downloadVideos(filename: returnVideoNo(row: n, coloumname: "videoUrl"))
                  
        }//for ends
-    }
+  
+    
 }
 
+
+}
 func loadvideosScreen(){ //loads array into screen for refresh
     if(showvideoDatabase()==true){ // if database is not empty
         videoList.removeAll()
@@ -131,17 +135,16 @@ func loadvideosScreen(){ //loads array into screen for refresh
           }
     
     
-    
 }
 
 struct Videos: View {
     
     @Binding var allowRefresh: Bool
-    @State var newVideoList = videoList
     @State var refreshCount = 0
     @State var refreshIcon: String = "rays"
     
     var body: some View {
+        loadvideosScreen()
         return Group {
             if(allowRefresh && refreshCount == 1) {
                 Videos(allowRefresh: $allowRefresh)
@@ -152,19 +155,15 @@ struct Videos: View {
                     // add content below refresh
 
                         
-                    List(newVideoList, id: \.videoNo) { videoAttributes in
+                    List(videoList, id: \.videoNo) { videoAttributes in
 
-                     NavigationLink(destination: VideoView(link:  findlocalDir(filename: videoAttributes.videoname).absoluteString) ) {
+                        NavigationLink(destination: VideoView(link:  findlocalDir(filename: videoAttributes.Url).absoluteString) ) {
                                            
                           Text( videoAttributes.videoname)
                           Text( videoAttributes.description)
                                              
                          }.navigationBarTitle(Text("Videos")).navigationBarItems(
-                            trailing: Button(action: {
-                                addvideos()
-                                self.newVideoList = videoList
-                                
-                            }, label: {Text("Sync")}))//navlink
+                         trailing: Button(action: addvideos, label: { Text("SyncVideos") }))//navlink
                          Text("View Video")
                 
                         
@@ -395,6 +394,7 @@ struct ShowDeleteView: View {
                 }
             }//Vstack
         }// End VStack
+        .offset(y: -50)
     }
     
     struct ConfirmDelete: View {
@@ -572,6 +572,7 @@ struct VideoGallery_Previews: PreviewProvider {
 let storageURL = "https://pa2001.cdms.westernsydney.edu.au/f/storage/app/public/"
 //this is the directory for video storage
 func downloadVideos (filename : String){
+    print("DownloadVideo from:" , storageURL + filename)
           // Create destination URL
            let documentsUrl:URL =  FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first! as URL
            //default.url = default path
