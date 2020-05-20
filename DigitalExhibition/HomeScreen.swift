@@ -8,7 +8,6 @@
 
 import SwiftUI
 import AVFoundation
-import QuickLookThumbnailing
 
 struct HomeScreen: View {
     @State private var displayPopup: Bool = false
@@ -96,57 +95,6 @@ struct HomeScreen: View {
     }
 }
 
-func generateThumbnailRepresentations() {
-    
-    // Set up the parameters of the request.
-    guard let url = Bundle.main.url(forResource: "example", withExtension: "png") else {
-        
-        // Handle the error case.
-        assert(false, "The URL can't be nil")
-        return
-    }
-    let size: CGSize = CGSize(width: 60, height: 90)
-    let scale = UIScreen.main.scale
-    
-    // Create the thumbnail request.
-    let request = QLThumbnailGenerator.Request(fileAt: url,
-                                               size: size,
-                                               scale: scale,
-                                               representationTypes: .all)
-    
-    // Retrieve the singleton instance of the thumbnail generator and generate the thumbnails.
-    let generator = QLThumbnailGenerator.shared
-    generator.generateRepresentations(for: request) { (thumbnail, type, error) in
-        DispatchQueue.main.async {
-            if thumbnail == nil || error != nil {
-                // Handle the error case gracefully.
-            } else {
-                Image("\(thumbnail)")
-                // Display the thumbnail that you created.
-            }
-        }
-    }
-}
-
-func generateThumbnail(url: URL) -> UIImage? {
-    do {
-        let asset = AVURLAsset(url: url)
-        let imageGenerator = AVAssetImageGenerator(asset: asset)
-        imageGenerator.appliesPreferredTrackTransform = true
-        // Select the right one based on which version you are using
-        // Swift 4.2
-        let cgImage = try imageGenerator.copyCGImage(at: .zero,
-                                                     actualTime: nil)
-        
-
-
-        return UIImage(cgImage: cgImage)
-    } catch {
-        print(error.localizedDescription)
-
-        return nil
-    }
-}
 
 
 struct EarthquakeVideoInformation: View {
@@ -154,26 +102,6 @@ struct EarthquakeVideoInformation: View {
     @Binding var choice: Int
     @State var goBack: Bool = false
     @State var tovideo: Bool = false
-    @State var imgThumbnail: UIImageView!
-    fileprivate func getThumbnailFromUrl(_ url: String?, _ completion: @escaping ((_ image: UIImage?)->Void)) {
-
-        guard let url = URL(string: url ?? "") else { return }
-        DispatchQueue.main.async {
-            let asset = AVAsset(url: url)
-            let assetImgGenerate = AVAssetImageGenerator(asset: asset)
-            assetImgGenerate.appliesPreferredTrackTransform = true
-
-            let time = CMTimeMake(value: 2, timescale: 1)
-            do {
-                let img = try assetImgGenerate.copyCGImage(at: time, actualTime: nil)
-                let thumbnail = UIImage(cgImage: img)
-                completion(thumbnail)
-            } catch {
-                print("Error :: ", error.localizedDescription)
-                completion(nil)
-            }
-        }
-    }
     var body: some View {
         return Group {
             if(self.goBack) {
@@ -181,9 +109,6 @@ struct EarthquakeVideoInformation: View {
             }
             else {
                 ZStack {
-                    /*UIImage(generateThumbnail(url: URL(string: findlocalDir(filename: returnVideoNo(row: choice, coloumname: "videoUrl")).absoluteString)!))*/
-                    //generateThumbnailRepresentations
-                    //VideoView(link:  findlocalDir(filename: returnVideoNo(row: choice, coloumname: "videoUrl")).absoluteString)
                     LinearGradient(gradient: Gradient(colors: [Color.white, Color(red: 46/255.0, green: 125/255.0, blue: 50/255.0, opacity: 1.0)]), startPoint: .top, endPoint: .bottom)
                     VStack {
                         Button(action: {
