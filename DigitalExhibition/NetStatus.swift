@@ -9,6 +9,10 @@
 import SwiftUI
 import Network
 
+/*
+ https://www.appcoda.com/network-framework/
+ */
+
 class NetStatus {
     static let shared = NetStatus()
     
