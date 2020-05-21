@@ -12,24 +12,23 @@ import Foundation
 import SQLite3
 
 struct LogIn: View {
-    
-
 
     @State var goBack = false
     @State var canSignIn = false
     @State var displayError = false
+    @State var username = ""
     
 
     var body: some View {
         return Group {
             if canSignIn {
-                VideoGallery()
+                VideoGallery(username: $username)
             }
             else if goBack {
                 SurveyScreen()
             }
             else {
-                LoginForm(goBack: $goBack, canSignIn: $canSignIn, displayError: $displayError)
+                LoginForm(goBack: $goBack, canSignIn: $canSignIn, displayError: $displayError, username: $username)
             }
         }
     }
@@ -41,11 +40,8 @@ struct LoginForm: View {
     @Binding var canSignIn: Bool
     @Binding var displayError: Bool
     
-    @State var username = ""
+    @Binding var username: String
     @State var password = ""
-    
-    @State var dummy_user = "Admin"
-    @State var dummy_pass = "PA2001"
         
     var body: some View {
         
@@ -110,8 +106,10 @@ struct LoginForm: View {
                                                     
                         
                           //  addusers()
-                            self.displayError = false
-                            if (showuserDatabase()==false){
+                            //self.displayError = false
+                            self.confirmUser(enteredUsername: self.username, enteredPassword: self.password)
+                            
+                            /*if (showuserDatabase()==false){
                                 print("Database is empty")
                                 errormessage = "Syncing ,user database empty, please try again in a few moments!"
                                 syncUserzDatabase()
@@ -128,7 +126,7 @@ struct LoginForm: View {
                                     errormessage = "Incorrect Username/Password"
                                 }
                                   self.displayError = true
-                            }
+                            }*/
                         }) {
                             Text("Sign in")
                             .font(.headline)
@@ -149,6 +147,24 @@ struct LoginForm: View {
         }
         
     }
+    func confirmUser(enteredUsername: String, enteredPassword: String) {
+        let user = UserDBManager().retrieveUserAttr()
+        var i = 0
+        while i != user.count {
+            if(user[i].username == enteredUsername && user[i].password == enteredPassword) {
+                displayError = false
+                errormessage = ""
+                canSignIn = true
+                break
+            }
+            else {
+                displayError = true
+                errormessage = "Username or password is incorrect!"
+                canSignIn = false
+            }
+            i += 1
+        }
+    }
 }
 
 
@@ -158,6 +174,7 @@ struct LogIn_Previews: PreviewProvider {
         LogIn()
     }
 }
+
 
 
 //DATABASE ADMIN USER FUNCTIONS

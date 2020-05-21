@@ -27,8 +27,8 @@ class UserDBManager: NSObject {
         product.setValue(password, forKey: "password")
         
         do {
-            try managedContext.save()
             products.append(product)
+            try managedContext.save()
        //     showMessage("Information is added")
         }
         catch let error as NSError {

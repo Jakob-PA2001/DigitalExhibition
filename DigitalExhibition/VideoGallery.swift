@@ -10,9 +10,9 @@ import SwiftUI
 import CoreData
 
 struct VideoGallery: View {
-    
     @State private var logout: Bool = false
     @State var allowRefresh: Bool = false
+    @Binding var username: String
     
     var body: some View {
         return Group {
@@ -20,7 +20,7 @@ struct VideoGallery: View {
                 SplashScreen()
             }
             else {
-                Menu(logout: $logout, allowRefresh: $allowRefresh)
+                Menu(currentUser: $username, logout: $logout, allowRefresh: $allowRefresh)
             }
         }
     }// End Body
@@ -28,6 +28,7 @@ struct VideoGallery: View {
 
 struct Menu: View {
     
+    @Binding var currentUser: String
     @Binding var logout: Bool
     @Binding var allowRefresh: Bool
     
@@ -42,10 +43,10 @@ struct Menu: View {
                 HStack() {
                     Image(systemName: "person.crop.circle.fill")
                         .font(.title)
-                        .offset(y: -10)
-                    Text("Admin")
+                        .offset(y: -30)
+                    Text(currentUser)
                         .font(.headline)
-                        .offset(y: -10)
+                        .offset(y: -30)
                 }// End HStack
                 .padding(.bottom, -15)
 
@@ -57,7 +58,7 @@ struct Menu: View {
                             Image(systemName: "video.circle")
                         }
                     }
-                    NavigationLink(destination: UserManagement()) {
+                    NavigationLink(destination: UserManagement(currentUser: $currentUser)) {
                         HStack {
                             Text("User Management")
                             Spacer()
@@ -177,11 +178,13 @@ struct Videos: View {
 }
 
 struct UserManagement: View {
+    @Binding var currentUser: String
     
     @State var users = UserDBManager().retrieveUserAttr()
-    @State private var width: CGFloat? = nil
+    @State private var width: CGFloat? = 250.0
     @State var showAddView: Bool = false
     @State var showDeleteView: Bool = false
+    @State private var showingAlert = false
     
     var body: some View {
         VStack {
@@ -226,6 +229,30 @@ struct UserManagement: View {
                     .lineLimit(1)
                     .background(CenteringView())
                 Spacer()
+                if(users.username != "Username") {
+                    Button(action: {
+                        if(users.username == self.currentUser) {
+                            self.showingAlert = true
+                        }}) {
+                        Image(systemName: "person.crop.circle.badge.minus")
+                            .foregroundColor(Color.red)
+                            .font(.title)
+                    }
+                    .alert(isPresented:self.$showingAlert) {
+                        Alert(title: Text("Alert!")
+                        .foregroundColor(Color.red), message: Text("You cannot delete yourself.")
+                            .foregroundColor(Color.red), dismissButton: .default(Text("Ok")))
+                    }//alert
+                    
+                }//if
+                else {
+                    Button(action: {}) {
+                        Image(systemName: "person.crop.circle.badge.minus")
+                            .foregroundColor(Color.white)
+                            .font(.title)
+                    }
+                }
+                
             }
         }// End VStack
         .navigationBarTitle(Text("User Management")).navigationBarItems(
@@ -303,6 +330,9 @@ struct ShowAddView: View {
                         }
                         else if(self.password != self.confirmPassword) {
                             self.errMessage = "Passwords do not match!"
+                        }
+                        else if(self.username == "Username") {
+                            self.errMessage = "Username cannot be 'Username'!"
                         }
                         else {
                             self.addUser()
@@ -558,7 +588,8 @@ struct refresh: View {
 
 struct VideoGallery_Previews: PreviewProvider {
     static var previews: some View {
-        VideoGallery()
+        Text("Preview")
+        //VideoGallery()
         /*.previewDevice("iPad mini 4")
         .previewLayout(
             PreviewLayout.fixed(

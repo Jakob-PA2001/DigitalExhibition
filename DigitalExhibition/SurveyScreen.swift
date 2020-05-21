@@ -48,6 +48,8 @@ struct SurveyScreen: View {
     }
 }
 
+let nations = Bundle.main.decode([Nationalities].self, from: "nationalities.json")
+
 struct Survey: View {
     //@Environment(\.presentationMode) var presentationMode
     
@@ -55,10 +57,14 @@ struct Survey: View {
     @Binding var login: Bool
     @Binding var goBack: Bool
     
-    @State var gender = ""
     @State var age = ""
-    @State var nationality = ""
     @State var errMessage = ""
+    
+    //let nation = NationalityDBManager().retrieveNation()
+    @State var selectedNation = 0
+    
+    let gender = ["Male", "Female", "Other"]
+    @State var selectedGender = 0
     
     var body: some View {
         
@@ -91,41 +97,76 @@ struct Survey: View {
                 Text(errMessage)
                     .foregroundColor(Color.red)
             }
-            VStack(alignment: .leading) {
+            Spacer()
+            VStack(alignment: .center) {
                 Section {
-                    Text("Age")
-                        .font(.headline)
-                    TextField("19, 20, 26..", text: self.$age)
-                        .padding()
-                        .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
-                        .cornerRadius(25)
+                    HStack {
+                        Text("Enter Your Age : ")
+                            .font(.headline)
+                            .offset(x: 25)
+                        TextField("19, 20, 26..", text: self.$age)
+                            .padding()
+                            .frame(width: 350, height: 50)
+                            .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                            .cornerRadius(25)
+                            .offset(x: 35)
+                    }
                 }
                 .padding()
                 Section {
-                    Text("Gender")
-                        .font(.headline)
-                    TextField("Male or Female", text: self.$gender)
+                    HStack {
+                        Spacer()
+                        Text("Select Your Gender : ")
+                            .font(.headline)
+                            .offset(x: 10)
+                        Picker(selection: $selectedGender, label: Text("")) {
+                            ForEach(0 ..< gender.count) {
+                                Text(self.gender[$0])
+
+                            }
+                        }
                         .padding()
-                        .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 0.5))
+                        .labelsHidden()
+                        .frame(height: 45)
+                        .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
                         .cornerRadius(25)
+                        .offset(x: 15)
+                        Spacer()
+                    }
                 }
                 .padding()
                 Section {
-                    Text("Nationality")
-                        .font(.headline)
-                    TextField("Australian, American, French, etc.", text: self.$nationality)
+                    HStack {
+                        Spacer()
+                        Text("Select Your Nationality : ")
+                            .font(.headline)
+                        Picker(selection: $selectedNation, label: Text("")) {
+                            /*ForEach(0 ..< nation.count) {
+                                Text(self.nation[$0])
+
+                            }*/
+                            ForEach(0 ..< nations.count) {
+                                Text(nations[$0].name)
+
+                            }
+                        }
                         .padding()
+                        .labelsHidden()
+                        .frame(height: 45)
                         .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
                         .cornerRadius(25)
+                        Spacer()
+                    }
                 }
                 .padding()
             }
+            Spacer()
             Section {
                 HStack {
                     Button(action: {
                         self.age = ""
-                        self.gender = ""
-                        self.nationality = ""
+                        self.selectedGender = 0
+                        self.selectedNation = 0
                     }) {
                         Text("Clear")
                             .font(.headline)
@@ -140,7 +181,7 @@ struct Survey: View {
                     }// End Button
                     .padding()
                     Button(action: {
-                        if(self.age.isEmpty || self.gender.isEmpty || self.nationality.isEmpty) {
+                        if(self.age.isEmpty) {
                             self.errMessage = "Please fill in all the fields."
                         }
                         else {
@@ -173,7 +214,7 @@ struct Survey: View {
     }
     func save() {
         let db = SurveyDBManager()
-        db.addRow(gender: self.gender, age: self.age, nationality: self.nationality)
+        db.addRow(gender: gender[selectedGender], age: self.age, nationality: nations[selectedNation].name)
     }
 }
 
@@ -183,3 +224,33 @@ struct SurveyScreen_Previews: PreviewProvider {
     }
 }
 
+
+extension Bundle {
+    func decode<T: Decodable>(_ type: T.Type, from file: String, dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .deferredToDate, keyDecodingStrategy: JSONDecoder.KeyDecodingStrategy = .useDefaultKeys) -> T {
+        guard let url = self.url(forResource: file, withExtension: nil) else {
+            fatalError("Failed to locate \(file) in bundle.")
+        }
+
+        guard let data = try? Data(contentsOf: url) else {
+            fatalError("Failed to load \(file) from bundle.")
+        }
+
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = dateDecodingStrategy
+        decoder.keyDecodingStrategy = keyDecodingStrategy
+
+        do {
+            return try decoder.decode(T.self, from: data)
+        } catch DecodingError.keyNotFound(let key, let context) {
+            fatalError("Failed to decode \(file) from bundle due to missing key '\(key.stringValue)' not found – \(context.debugDescription)")
+        } catch DecodingError.typeMismatch(_, let context) {
+            fatalError("Failed to decode \(file) from bundle due to type mismatch – \(context.debugDescription)")
+        } catch DecodingError.valueNotFound(let type, let context) {
+            fatalError("Failed to decode \(file) from bundle due to missing \(type) value – \(context.debugDescription)")
+        } catch DecodingError.dataCorrupted(_) {
+            fatalError("Failed to decode \(file) from bundle because it appears to be invalid JSON")
+        } catch {
+            fatalError("Failed to decode \(file) from bundle: \(error.localizedDescription)")
+        }
+    }
+}

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		840055AA2476324600AA9671 /* nationalities.json in Resources */ = {isa = PBXBuildFile; fileRef = 840055A92476324600AA9671 /* nationalities.json */; };
 		84010A322474E011005E006C /* NetStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84010A312474E011005E006C /* NetStatus.swift */; };
 		840A7AA9246E64C500FB03AE /* TestScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840A7AA8246E64C500FB03AE /* TestScreen.swift */; };
 		8419BC062472705600CDA74A /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8419BC052472705600CDA74A /* VideoView.swift */; };
@@ -18,6 +19,8 @@
 		841EC9CE245FF8A7007D6D3D /* HomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841EC9CD245FF8A7007D6D3D /* HomeScreen.swift */; };
 		841EC9D02460027E007D6D3D /* LogIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841EC9CF2460027E007D6D3D /* LogIn.swift */; };
 		842219A9246148440079241B /* VideoGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842219A8246148440079241B /* VideoGallery.swift */; };
+		845027DE2476450C00214F6D /* NationalityDBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845027DD2476450C00214F6D /* NationalityDBManager.swift */; };
+		845027E0247650F700214F6D /* Nationalities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845027DF247650F700214F6D /* Nationalities.swift */; };
 		848BD4892473A3FA00BB7795 /* UserDBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848BD4882473A3FA00BB7795 /* UserDBManager.swift */; };
 		848C7A772459559E000C4017 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848C7A762459559E000C4017 /* AppDelegate.swift */; };
 		848C7A792459559E000C4017 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848C7A782459559E000C4017 /* SceneDelegate.swift */; };
@@ -49,6 +52,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		840055A92476324600AA9671 /* nationalities.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = nationalities.json; path = ../../../nationalities.json; sourceTree = "<group>"; };
 		84010A312474E011005E006C /* NetStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetStatus.swift; sourceTree = "<group>"; };
 		840A7AA8246E64C500FB03AE /* TestScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestScreen.swift; sourceTree = "<group>"; };
 		8419BC052472705600CDA74A /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
@@ -60,6 +64,8 @@
 		841EC9CD245FF8A7007D6D3D /* HomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreen.swift; sourceTree = "<group>"; };
 		841EC9CF2460027E007D6D3D /* LogIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogIn.swift; sourceTree = "<group>"; };
 		842219A8246148440079241B /* VideoGallery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoGallery.swift; sourceTree = "<group>"; };
+		845027DD2476450C00214F6D /* NationalityDBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NationalityDBManager.swift; sourceTree = "<group>"; };
+		845027DF247650F700214F6D /* Nationalities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Nationalities.swift; path = ../../../../.Trash/Nationalities.swift; sourceTree = "<group>"; };
 		848BD4882473A3FA00BB7795 /* UserDBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDBManager.swift; sourceTree = "<group>"; };
 		848C7A732459559E000C4017 /* DigitalExhibition.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DigitalExhibition.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		848C7A762459559E000C4017 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -132,6 +138,7 @@
 				8419BC0B247275A300CDA74A /* SurveyDBManager.swift */,
 				84010A312474E011005E006C /* NetStatus.swift */,
 				848BD4882473A3FA00BB7795 /* UserDBManager.swift */,
+				845027DD2476450C00214F6D /* NationalityDBManager.swift */,
 				84D4B005247414FF006134D8 /* OnlineUserDB.swift */,
 				848C7A782459559E000C4017 /* SceneDelegate.swift */,
 				848C7A7A2459559E000C4017 /* ContentView.swift */,
@@ -139,6 +146,8 @@
 				841EC9CB245FF86E007D6D3D /* SurveyScreen.swift */,
 				841EC9CF2460027E007D6D3D /* LogIn.swift */,
 				842219A8246148440079241B /* VideoGallery.swift */,
+				840055A92476324600AA9671 /* nationalities.json */,
+				845027DF247650F700214F6D /* Nationalities.swift */,
 				8419BC052472705600CDA74A /* VideoView.swift */,
 				8419BC072472707300CDA74A /* Utility.swift */,
 				8419BC092472708500CDA74A /* DatabaseMethod.swift */,
@@ -284,6 +293,7 @@
 			files = (
 				848C7A83245955A0000C4017 /* LaunchScreen.storyboard in Resources */,
 				848C7A80245955A0000C4017 /* Preview Assets.xcassets in Resources */,
+				840055AA2476324600AA9671 /* nationalities.json in Resources */,
 				848C7A7D245955A0000C4017 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -309,6 +319,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				845027E0247650F700214F6D /* Nationalities.swift in Sources */,
 				8419BC062472705600CDA74A /* VideoView.swift in Sources */,
 				841EC9CA245FF842007D6D3D /* SplashScreen.swift in Sources */,
 				848C7A772459559E000C4017 /* AppDelegate.swift in Sources */,
@@ -319,6 +330,7 @@
 				84D4B006247414FF006134D8 /* OnlineUserDB.swift in Sources */,
 				8419BC082472707400CDA74A /* Utility.swift in Sources */,
 				848C7A792459559E000C4017 /* SceneDelegate.swift in Sources */,
+				845027DE2476450C00214F6D /* NationalityDBManager.swift in Sources */,
 				84FBE6AF2469031000F7DDFC /* DigitalExhibition.xcdatamodeld in Sources */,
 				84010A322474E011005E006C /* NetStatus.swift in Sources */,
 				840A7AA9246E64C500FB03AE /* TestScreen.swift in Sources */,
@@ -495,6 +507,7 @@
 				DEVELOPMENT_TEAM = 9CZ4D9D8MK;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = DigitalExhibition/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -515,6 +528,7 @@
 				DEVELOPMENT_TEAM = 9CZ4D9D8MK;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = DigitalExhibition/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
