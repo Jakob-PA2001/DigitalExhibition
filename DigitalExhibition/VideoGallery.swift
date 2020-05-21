@@ -10,9 +10,11 @@ import SwiftUI
 import CoreData
 
 struct VideoGallery: View {
+    @Binding var username: String
+    
     @State private var logout: Bool = false
     @State var allowRefresh: Bool = false
-    @Binding var username: String
+    @State var users = UserDBManager().retrieveUserAttr()
     
     var body: some View {
         return Group {
@@ -20,7 +22,7 @@ struct VideoGallery: View {
                 SplashScreen()
             }
             else {
-                Menu(currentUser: $username, logout: $logout, allowRefresh: $allowRefresh)
+                Menu(currentUser: $username, logout: $logout, allowRefresh: $allowRefresh, users: self.$users)
             }
         }
     }// End Body
@@ -31,6 +33,7 @@ struct Menu: View {
     @Binding var currentUser: String
     @Binding var logout: Bool
     @Binding var allowRefresh: Bool
+    @Binding var users: [UserDBManager.userAttr]
     
     var body: some View {
         NavigationView {
@@ -58,7 +61,7 @@ struct Menu: View {
                             Image(systemName: "video.circle")
                         }
                     }
-                    NavigationLink(destination: UserManagement(currentUser: $currentUser)) {
+                    NavigationLink(destination: UserManagement(currentUser: $currentUser, users: self.$users)) {
                         HStack {
                             Text("User Management")
                             Spacer()
@@ -177,14 +180,18 @@ struct Videos: View {
     }
 }
 
+enum ActiveAlert {
+    case first, second
+}
+
 struct UserManagement: View {
     @Binding var currentUser: String
+    @Binding var users: [UserDBManager.userAttr]
     
-    @State var users = UserDBManager().retrieveUserAttr()
     @State private var width: CGFloat? = 250.0
     @State var showAddView: Bool = false
-    @State var showDeleteView: Bool = false
-    @State private var showingAlert = false
+    @State private var showAlert = false
+    @State private var activeAlert: ActiveAlert = .first
     
     var body: some View {
         VStack {
@@ -194,20 +201,6 @@ struct UserManagement: View {
                             HStack(alignment: .firstTextBaseline) {
                                 Text("Add User")
                                 Image(systemName: "person.crop.circle.badge.plus")
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                            }
-                    }
-                    Spacer()
-                }.padding(.leading)
-                Rectangle()
-                    .frame(height: 1)
-                    .foregroundColor(Color(red: 238.0/255.0, green: 238.0/255.0, blue: 238.0/255.0, opacity: 1.0))
-                HStack {
-                    NavigationLink(destination: ShowDeleteView(users: self.$users)) {
-                            HStack(alignment: .firstTextBaseline) {
-                                Text("Delete User")
-                                Image(systemName: "person.crop.circle.badge.minus")
                                 Spacer()
                                 Image(systemName: "chevron.right")
                             }
@@ -232,18 +225,30 @@ struct UserManagement: View {
                 if(users.username != "Username") {
                     Button(action: {
                         if(users.username == self.currentUser) {
-                            self.showingAlert = true
-                        }}) {
+                            self.activeAlert = .first
+                        } else {
+                            self.activeAlert = .second
+                        }
+                        self.showAlert = true
+                    }) {
                         Image(systemName: "person.crop.circle.badge.minus")
                             .foregroundColor(Color.red)
                             .font(.title)
                     }
-                    .alert(isPresented:self.$showingAlert) {
-                        Alert(title: Text("Alert!")
-                        .foregroundColor(Color.red), message: Text("You cannot delete yourself.")
-                            .foregroundColor(Color.red), dismissButton: .default(Text("Ok")))
-                    }//alert
-                    
+                    .alert(isPresented:self.$showAlert) {
+                        switch self.activeAlert {
+                        case .first:
+                            return Alert(title: Text("Alert!")
+                                    .foregroundColor(Color.red), message: Text("You cannot delete yourself.")
+                                    .foregroundColor(Color.red), dismissButton: .default(Text("Ok")))
+                        case .second:
+                            return Alert(title: Text("Alert!")
+                                .foregroundColor(Color.red), message: Text("Are you sure you want to delete " + users.username)
+                                .foregroundColor(Color.red), primaryButton: .default(Text("Yes")) {
+                                    self.deleteUser(username: users.username)
+                                }, secondaryButton: .destructive(Text("Cancel")))
+                        }//switch
+                    }//alertz
                 }//if
                 else {
                     Button(action: {}) {
@@ -265,10 +270,17 @@ struct UserManagement: View {
                 Image(systemName: "rays")
             })
     }
+
+    func deleteUser(username: String){
+        let db = UserDBManager()
+        db.deleteUser(username: username)
+        users = UserDBManager().retrieveUserAttr()
+    }
 }
 
 struct ShowAddView: View {
     @Binding var users: [UserDBManager.userAttr]
+    
     @State var username = ""
     @State var password = ""
     @State var confirmPassword = ""
@@ -370,8 +382,9 @@ struct ShowAddView: View {
     }
 }
 
-struct ShowDeleteView: View {
+/*struct ShowDeleteView: View {
     @Binding var users: [UserDBManager.userAttr]
+    @Binding var user: String
     
     @State var errMessage = ""
     @State var username = ""
@@ -425,9 +438,9 @@ struct ShowDeleteView: View {
             }//Vstack
         }// End VStack
         .offset(y: -50)
-    }
+    }*/
     
-    struct ConfirmDelete: View {
+    /*struct ConfirmDelete: View {
         @Environment(\.presentationMode) var presentationMode
         @Binding var users: [UserDBManager.userAttr]
         @Binding var username: String
@@ -463,22 +476,8 @@ struct ShowDeleteView: View {
             }
         }
     }
-}
+}*/
 
-func deleteUser(username: String) -> Bool{
-    
-    var userExists: Bool = false
-    let db = UserDBManager()
-    userExists = db.doesUserExist(username: username)
-    
-    if(!userExists) {
-        return false
-    }
-    else {
-        db.deleteUser(username: username)
-        return true
-    }
-}
 
 
 struct SurveyManagement: View {
