@@ -33,8 +33,8 @@ class SurveyDBManager: NSObject {
         product.setValue(nationality, forKey: "nationality")
         
         do {
-            try managedContext.save()
             products.append(product)
+            try managedContext.save()
        //     showMessage("Information is added")
         }
         catch let error as NSError {

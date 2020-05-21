@@ -22,6 +22,8 @@ struct SplashScreen: View {
     }
 }
 
+//let nations = Bundle.main.decode([Nationalities].self, from: "nationalities.json")
+
 struct Welcome: View {
     
     @State private var displaySurvey: Bool = false
@@ -84,3 +86,4 @@ struct SplashScreen_Previews: PreviewProvider {
         SplashScreen()
     }
 }
+
