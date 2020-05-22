@@ -15,6 +15,8 @@ class SurveyDBManager: NSObject {
     
     var products: [NSManagedObject] = []
     
+    let monitor = NWPathMonitor()
+    
     func addRow( gender:String, age:String, nationality:String) {
         // set the core data to access the Product Entity
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
@@ -114,49 +116,61 @@ class SurveyDBManager: NSObject {
     }
     
     func submitSurvey() { // return array of Strings
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-           return}
-        let managedContext = appDelegate.persistentContainer.viewContext
-        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Surveys")
-        do {
-           products  = try managedContext.fetch(fetchRequest)
-        }
-        catch let error as NSError{
-           print("Error While Retrieving from Core Data" + (error as! String) )
-        }
+        let queue = DispatchQueue(label: "Monitor")
+        self.monitor.start(queue: queue)
         
-        if(!products.isEmpty) {
-            let url = URL(string: "https://pa2001.cdms.westernsydney.edu.au/addsurvey.php")
-            
-            var request = URLRequest(url: url!)
-            request.httpMethod = "POST"
-            
-            var dataString = "secretWord=pa2001" // starting POST string with a secretWord
-            // the POST string
-            
-            //var msg : [String] = []
-            for product in products {
-                dataString = dataString + "&a=\((product.value(forKeyPath: "gender") as? String)!)" // replace "username.txt with own declared variable.
-                dataString = dataString + "&b=\((product.value(forKeyPath: "age") as? String)!)" // replace "password.txt with own declared variable.
-                dataString = dataString + "&c=\((product.value(forKeyPath: "nationality") as? String)!)" // replace "password.txt with own declared variable.
-                let dataD = dataString.data(using: .utf8) // convert to utf8 string
-                
-                do
-                {
-                
-                    // EXECUTE POST REQUEST
-
-                    let uploadJob = URLSession.shared.uploadTask(with: request, from: dataD)
-                    {
-                        data, response, error in
-                        
-                       
-                    }
-                    uploadJob.resume()
-                    dataString = "secretWord=pa2001"
-                }
+        self.monitor.pathUpdateHandler = { path in
+        if path.status == .satisfied {
+            print("We're connected!")
+            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+               return}
+            let managedContext = appDelegate.persistentContainer.viewContext
+            let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Surveys")
+            do {
+                self.products  = try managedContext.fetch(fetchRequest)
             }
-            deleteAll()
+            catch let error as NSError{
+               print("Error While Retrieving from Core Data" + (error as! String) )
+            }
+            
+            if(!self.products.isEmpty) {
+                let url = URL(string: "https://pa2001.cdms.westernsydney.edu.au/addsurvey.php")
+                
+                var request = URLRequest(url: url!)
+                request.httpMethod = "POST"
+                
+                var dataString = "secretWord=pa2001" // starting POST string with a secretWord
+                // the POST string
+                
+                //var msg : [String] = []
+                for product in self.products {
+                    dataString = dataString + "&a=\((product.value(forKeyPath: "gender") as? String)!)" // replace "username.txt with own declared variable.
+                    dataString = dataString + "&b=\((product.value(forKeyPath: "age") as? String)!)" // replace "password.txt with own declared variable.
+                    dataString = dataString + "&c=\((product.value(forKeyPath: "nationality") as? String)!)" // replace "password.txt with own declared variable.
+                    let dataD = dataString.data(using: .utf8) // convert to utf8 string
+                    
+                    do
+                    {
+                    
+                        // EXECUTE POST REQUEST
+
+                        let uploadJob = URLSession.shared.uploadTask(with: request, from: dataD)
+                        {
+                            data, response, error in
+                            
+                           
+                        }
+                        uploadJob.resume()
+                        dataString = "secretWord=pa2001"
+                    }
+                }
+                self.deleteAll()
+            }
+        } else {
+            print("No connection.")
+        }
+
+        print(path.isExpensive)
         }
         // convert POST string to utf8 format
         

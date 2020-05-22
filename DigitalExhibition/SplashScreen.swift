@@ -22,62 +22,60 @@ struct SplashScreen: View {
     }
 }
 
-//let nations = Bundle.main.decode([Nationalities].self, from: "nationalities.json")
-
 struct Welcome: View {
     
     @State private var displaySurvey: Bool = false
     @Binding var canExplore: Bool
     
     var body: some View {
-        //NavigationView {
+        VStack {
             VStack {
                 HStack {
                     Image("fire.logo")
                         .font(.subheadline)
-                        .multilineTextAlignment(.leading)
                         .padding()
                     Spacer()
                     Image("wsu.logo")
                         .font(.subheadline)
-                        .multilineTextAlignment(.trailing)
                         .padding()
                 }
-                .padding(.top, -620)
-                .offset(y: 260)
-                Image("splash")
-                    .resizable()
-                    .padding(.top, -620)
-                    .offset(y: 360)
-                    .aspectRatio(contentMode: .fit)
-                VStack {
-                    Text("Welcome to the Langtang Heritage Trail")
-                        .font(.largeTitle)
-                    Button(action: {
-                        if(self.canExplore == false) {
-                            self.canExplore = true
-                        }
-                        //self.displaySurvey = true
-                    }) {
-                            Text("EXPLORE")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .padding()
-                                .fixedSize()
-                                .frame(width: 140, height: 45)
-                                .foregroundColor(.white)
-                                .background(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0))
-                                .cornerRadius(8)
-                        
+                ZStack {
+                    HStack {
+                        Image("splash")
+                        .resizable()
+                        .frame(width: UIScreen.main.bounds.width, height:  UIScreen.main.bounds.height * 3/4)
+                        .aspectRatio(contentMode: .fit)
+                        .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/3)
                     }
-                    .offset(y: 5)
-                    /*.sheet(isPresented: self.$displaySurvey) {
-                        SurveyScreen()
-                    }*/
+                    VStack {
+                        Text("Welcome to the Langtang Heritage Trail")
+                            .font(.largeTitle)
+                            .shadow(color: .gray, radius: 2, x: 0, y: 5)
+                            .padding()
+                        Button(action: {
+                            //UserDBManager().DeleteAll()
+                            //OnlineUserDB().DownloadUsers()
+                            if(self.canExplore == false) {
+                                self.canExplore = true
+                            }
+                        }) {
+                                Text("EXPLORE")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                    .padding()
+                                    .fixedSize()
+                                    .frame(width: 140, height: 45)
+                                    .foregroundColor(.white)
+                                    .background(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0))
+                                    .cornerRadius(25)
+                                    .shadow(color: .gray, radius: 2, x: 0, y: 5)
+                            
+                        }
+                    }
+                    .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/3)
                 }
             }
-        //}
-        //.navigationViewStyle(StackNavigationViewStyle())
+        }
     }
 }
 

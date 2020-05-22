@@ -8,11 +8,14 @@
 
 import SwiftUI
 import CoreData
+import Network
 
 struct VideoGallery: View {
+    @Binding var username: String
+    
     @State private var logout: Bool = false
     @State var allowRefresh: Bool = false
-    @Binding var username: String
+    @State var users = UserDBManager().retrieveUserAttr()
     
     var body: some View {
         return Group {
@@ -20,7 +23,7 @@ struct VideoGallery: View {
                 SplashScreen()
             }
             else {
-                Menu(currentUser: $username, logout: $logout, allowRefresh: $allowRefresh)
+                Menu(currentUser: $username, logout: $logout, allowRefresh: $allowRefresh, users: self.$users)
             }
         }
     }// End Body
@@ -31,6 +34,7 @@ struct Menu: View {
     @Binding var currentUser: String
     @Binding var logout: Bool
     @Binding var allowRefresh: Bool
+    @Binding var users: [UserDBManager.userAttr]
     
     var body: some View {
         NavigationView {
@@ -58,7 +62,7 @@ struct Menu: View {
                             Image(systemName: "video.circle")
                         }
                     }
-                    NavigationLink(destination: UserManagement(currentUser: $currentUser)) {
+                    NavigationLink(destination: UserManagement(currentUser: $currentUser, users: self.$users)) {
                         HStack {
                             Text("User Management")
                             Spacer()
@@ -177,14 +181,19 @@ struct Videos: View {
     }
 }
 
+enum ActiveAlert {
+    case first, second, third, fourth
+}
+
 struct UserManagement: View {
     @Binding var currentUser: String
+    @Binding var users: [UserDBManager.userAttr]
     
-    @State var users = UserDBManager().retrieveUserAttr()
     @State private var width: CGFloat? = 250.0
     @State var showAddView: Bool = false
-    @State var showDeleteView: Bool = false
-    @State private var showingAlert = false
+    @State private var showAlert = false
+    @State private var activeAlert: ActiveAlert = .first
+    let monitor = NWPathMonitor()
     
     var body: some View {
         VStack {
@@ -194,20 +203,6 @@ struct UserManagement: View {
                             HStack(alignment: .firstTextBaseline) {
                                 Text("Add User")
                                 Image(systemName: "person.crop.circle.badge.plus")
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                            }
-                    }
-                    Spacer()
-                }.padding(.leading)
-                Rectangle()
-                    .frame(height: 1)
-                    .foregroundColor(Color(red: 238.0/255.0, green: 238.0/255.0, blue: 238.0/255.0, opacity: 1.0))
-                HStack {
-                    NavigationLink(destination: ShowDeleteView(users: self.$users)) {
-                            HStack(alignment: .firstTextBaseline) {
-                                Text("Delete User")
-                                Image(systemName: "person.crop.circle.badge.minus")
                                 Spacer()
                                 Image(systemName: "chevron.right")
                             }
@@ -232,18 +227,60 @@ struct UserManagement: View {
                 if(users.username != "Username") {
                     Button(action: {
                         if(users.username == self.currentUser) {
-                            self.showingAlert = true
-                        }}) {
+                            self.activeAlert = .first
+                        } else {
+                            if(users.location == "Offline") {
+                                print("loc: " + users.location)
+                                self.activeAlert = .second
+                            }
+                            else if(users.location == "Online"){
+                                let queue = DispatchQueue(label: "Monitor")
+                                self.monitor.start(queue: queue)
+                                
+                                self.monitor.pathUpdateHandler = { path in
+                                if path.status == .satisfied {
+                                    print("We're connected!")
+                                    print("stat: " + users.location)
+                                    self.activeAlert = .third
+                                } else {
+                                    print("No connection.")
+                                    self.activeAlert = .fourth
+                                }
+
+                                print(path.isExpensive)
+                                }
+                            }
+                        }
+                        self.showAlert = true
+                    }) {
                         Image(systemName: "person.crop.circle.badge.minus")
                             .foregroundColor(Color.red)
                             .font(.title)
                     }
-                    .alert(isPresented:self.$showingAlert) {
-                        Alert(title: Text("Alert!")
-                        .foregroundColor(Color.red), message: Text("You cannot delete yourself.")
-                            .foregroundColor(Color.red), dismissButton: .default(Text("Ok")))
-                    }//alert
-                    
+                    .alert(isPresented:self.$showAlert) {
+                        switch self.activeAlert {
+                            case .first:
+                                return Alert(title: Text("Alert!")
+                                        .foregroundColor(Color.red), message: Text("You cannot delete yourself.")
+                                        .foregroundColor(Color.red), dismissButton: .default(Text("Ok")))
+                            case .second:
+                                return Alert(title: Text("Alert!")
+                                    .foregroundColor(Color.red), message: Text("Are you sure you want to delete " + users.username)
+                                    .foregroundColor(Color.red), primaryButton: .default(Text("Yes")) {
+                                        self.deleteLocalUser(username: users.username)
+                                    }, secondaryButton: .destructive(Text("Cancel")))
+                            case .third:
+                                return Alert(title: Text("Alert!")
+                                    .foregroundColor(Color.red), message: Text("Are you sure you want to delete " + users.username)
+                                    .foregroundColor(Color.red), primaryButton: .default(Text("Yes")) {
+                                        self.deleteOnlineUser(username: users.username, password: users.password)
+                                    }, secondaryButton: .destructive(Text("Cancel")))
+                            case .fourth:
+                                return Alert(title: Text("Alert!")
+                                    .foregroundColor(Color.red), message: Text("Please connect to the internet to delete " + users.username)
+                                    .foregroundColor(Color.red), dismissButton: .default(Text("Ok")))
+                        }//switch
+                    }//alertz
                 }//if
                 else {
                     Button(action: {}) {
@@ -259,16 +296,30 @@ struct UserManagement: View {
         trailing: Button(action: {
             let db = UserDBManager()
             db.uploadUsers()
-            
         }) {
                 Text("Sync Users")
                 Image(systemName: "rays")
             })
     }
+
+    func deleteLocalUser(username: String){
+        let localDb = UserDBManager()
+        localDb.deleteUser(username: username)
+        users = UserDBManager().retrieveUserAttr()
+    }
+
+    func deleteOnlineUser(username: String, password: String){
+        let localDb = UserDBManager()
+        let onlineDb = OnlineUserDB()
+        onlineDb.DeleteUser(username: username, password: password)
+        localDb.deleteUser(username: username)
+        users = UserDBManager().retrieveUserAttr()
+    }
 }
 
 struct ShowAddView: View {
     @Binding var users: [UserDBManager.userAttr]
+    
     @State var username = ""
     @State var password = ""
     @State var confirmPassword = ""
@@ -360,7 +411,7 @@ struct ShowAddView: View {
             errMessage = "Username already exists!"
         }
         else {
-            db.addUser(username: self.username, password: self.password)
+            db.addUser(username: self.username, password: self.password, location: "Offline")
             errMessage = "User has successfully been added!"
             users = UserDBManager().retrieveUserAttr()
             self.username = ""
@@ -370,121 +421,11 @@ struct ShowAddView: View {
     }
 }
 
-struct ShowDeleteView: View {
-    @Binding var users: [UserDBManager.userAttr]
-    
-    @State var errMessage = ""
-    @State var username = ""
-    @State var popUpConfirm: Bool = false
-    @State var confirm: Bool = false
-    
-    var body: some View {
-        return Group {
-            VStack {
-                VStack {
-                    Text("Delete User")
-                        .font(.title)
-                    Text("Please enter the username of the user to be deleted:")
-                    Text(errMessage)
-                        .foregroundColor(Color.red)
-                    VStack {
-                        Section {
-                            Text("Username")
-                                .font(.headline)
-                                .padding(.bottom, -20)
-                            TextField("", text: self.$username)
-                                .padding()
-                                .frame(width: 600)
-                                //.frame(width: UIScreen.main.bounds.width - 34)
-                                .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
-                                .cornerRadius(10)
-                        }
-                        .padding()
-                        Button(action: {
-                            if(self.username.isEmpty) {
-                                self.errMessage = "Please enter a username!"
-                            }else {
-                                self.errMessage = ""
-                                self.popUpConfirm = true
-                            }
-                        }) {
-                            Text("Delete User")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                            .padding()
-                            .fixedSize()
-                            .frame(width: 140, height: 45)
-                            .foregroundColor(.white)
-                            .background(Color.black)
-                            .cornerRadius(8)
-                        }.sheet(isPresented: self.$popUpConfirm) {
-                            ConfirmDelete(users: self.$users, username: self.$username, errMessage: self.$errMessage)
-                        }
-                    }
-                }
-            }//Vstack
-        }// End VStack
-        .offset(y: -50)
-    }
-    
-    struct ConfirmDelete: View {
-        @Environment(\.presentationMode) var presentationMode
-        @Binding var users: [UserDBManager.userAttr]
-        @Binding var username: String
-        @Binding var errMessage: String
-        var body: some View {
-            VStack {
-                Text("Please tap confirm to delete user: " + self.username)
-                    .font(.headline)
-                    .padding()
-                Button(action: {
-                    if(deleteUser(username: self.username)) {
-                        self.username = ""
-                        self.errMessage = "User has successfully been deleted."
-                        self.users = UserDBManager().retrieveUserAttr()
-                        self.presentationMode.wrappedValue.dismiss()
-                    }
-                    else {
-                        self.username = ""
-                        self.errMessage = "User does not exist!"
-                        self.presentationMode.wrappedValue.dismiss()
-                    }
-                }) {
-                    Text("Confirm")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .padding()
-                    .fixedSize()
-                    .frame(width: 140, height: 45)
-                    .foregroundColor(.white)
-                    .background(Color(red: 183/255.0, green: 28/255.0, blue: 28/255.0, opacity: 1.0))
-                    .cornerRadius(8)
-                }
-            }
-        }
-    }
-}
-
-func deleteUser(username: String) -> Bool{
-    
-    var userExists: Bool = false
-    let db = UserDBManager()
-    userExists = db.doesUserExist(username: username)
-    
-    if(!userExists) {
-        return false
-    }
-    else {
-        db.deleteUser(username: username)
-        return true
-    }
-}
-
-
 struct SurveyManagement: View {
-    
     @State var surveys = SurveyDBManager().retrieveAttr()
     @State private var width: CGFloat? = nil
+    let monitor = NWPathMonitor()
+    @State private var showAlert = false
     
     var body: some View {
         VStack {
@@ -522,12 +463,32 @@ struct SurveyManagement: View {
         }//End VStack
             .navigationBarTitle(Text("Survey Management")).navigationBarItems(
         trailing: Button(action: {
-                let db = SurveyDBManager()
-                db.submitSurvey()
-                self.surveys = SurveyDBManager().retrieveAttr()
+                let queue = DispatchQueue(label: "Monitor")
+                self.monitor.start(queue: queue)
+                
+                self.monitor.pathUpdateHandler = { path in
+                if path.status == .satisfied {
+                    self.showAlert = false
+                    let db = SurveyDBManager()
+                    db.submitSurvey()
+                    self.surveys = SurveyDBManager().retrieveAttr()
+                    print("We're connected!")
+                } else {
+                    self.showAlert = true
+                    print("No connection.")
+                }
+
+                print(path.isExpensive)
+            }
             }) {
                 Text("Upload Surveys")
                 Image(systemName: "square.and.arrow.up")
+            }
+            .alert(isPresented:self.$showAlert) {
+                Alert(title: Text("Alert!")
+                .foregroundColor(Color.red), message: Text("Please connect to the internet to upload surveys.")
+                .foregroundColor(Color.red), dismissButton: .default(Text("Ok")))
+                
             })
     }// End body
 }

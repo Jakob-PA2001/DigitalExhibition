@@ -8,77 +8,65 @@
 
 import SwiftUI
 import CoreData
+import Network
 
 //For Testing purposes
 
 
 struct TestScreen: View {
-    //var nationality = Nationalities
-    @State var nation = NationalityDBManager().retrieveNation()
-    @State var selectedIndex = 0
-    @State private var showingDeleteAlert = false
-    @State var users = UserDBManager().retrieveUsers()
-    @State var attr = UserDBManager().retrieveUserAttr()
     
     var body: some View {
         VStack {
-            Text("Test")
-            Button(action: {}) {
-                Text("Test")
-            }
-            List {
-                ForEach(0 ..< users.count) {
-                    Text(self.users[$0] + " " + self.users[$0])
-                    Text("\($0)")
-                    //users += 1
-                }
-            }
-            List(attr, id: \.username) { user in
-                Text(user.username)
-                Spacer()
-                Text(user.password)
-                Spacer()
-                if(user.username != "Username") {
-                    Button(action: {self.showingDeleteAlert = true}) {
-                        Image(systemName: "person.crop.circle.badge.minus")
-                            .foregroundColor(Color.red)
-                            .font(.title)
-                    }
-                    .alert(isPresented:self.$showingDeleteAlert) {
-                        Alert(title: Text("SwiftUI Alert!"), message: Text("This is so easy"), primaryButton: .default(Text("Yes")) {
-                            self.add(usernamee: user.username)
-                        }, secondaryButton: .destructive(Text("Cancel")))
-                    }
-                }//if
-            }
-             
-                
-            //}
-            /*ForEach(0 ..< nation.count) {
-                Text(self.nation[$0])
-
-            }*/
-            /*Picker(selection: $selectedIndex, label: Text("")) {
-                ForEach(nation, id: \.name) { nation in
-                    Text("hell").tag(nations)
-                    Text(nation.name).tag(nation)
-                }
-            }*/
-            /*List(nation, id: \.name) { nation in
-                Text(nation.name)
-                Spacer()
-            }*/
-            //Text(nationality.name)
-        }
-        /*Picker(selection: $nationality.name, label: Text("Nationality")) {
-        }*/
-        /*Button(action: {self.du.DownloadUsers()}) {
-            Text("Test")
-        }*/
+            ZStack {
+                Color(red: 66/255.0, green: 142/255.0, blue: 146/255.0, opacity: 1.0)
+                VStack {
+                    HStack {
+                        Button(action: {}) {
+                            Image(systemName: "arrow.left")
+                            Text("Finish Viewing")
+                        }
+                        .padding()
+                        .fixedSize()
+                        .frame(width: 250, height: 45)
+                        .foregroundColor(.white)
+                        .background(Color(red: 28/255.0, green: 49/255.0, blue: 58/255.0, opacity: 1.0))
+                        .cornerRadius(25)
+                        .shadow(color: Color(red: 30/255.0, green: 50/255.0, blue: 60/255.0, opacity: 0.75), radius: 1, x: 0, y: 3)
+                    }// HStack
+                    .padding()
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        VStack {
+                            Spacer()
+                            Text("EEE")
+                            Spacer()
+                            Text("111")
+                            Spacer()
+                            Text("222")
+                            Spacer()
+                            Text("333")
+                            Spacer()
+                        }// VStack
+                        .padding()
+                        Spacer()
+                        VStack {
+                            Spacer()
+                            Text("Circle")
+                            Spacer()
+                            Text("About")
+                            Spacer()
+                        }// VStack
+                        .padding()
+                        Spacer()
+                    }// HStack
+                    Spacer()
+                }// VStack
+            }// ZStack
+        }// VStack
     }// End Body
     
-    func add(usernamee: String) {
-        print(usernamee)
+    func test() {
     }
 }
 
