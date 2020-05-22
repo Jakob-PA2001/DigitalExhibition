@@ -38,16 +38,16 @@ struct HomeScreen: View {
                 Video3Information(displayPopup: $displayPopup, choice: $choice)
             }
             else {
-                ZStack {
-                    Color(red: 66/255.0, green: 142/255.0, blue: 146/255.0, opacity: 1.0)
-                    VStack(/*alignment: .leading*/) {
+                VStack {
+                    ZStack {
+                        Color(red: 66/255.0, green: 142/255.0, blue: 146/255.0, opacity: 1.0)
                         VStack {
-                            // Exit Button
-                            HStack(alignment: .center) {
+                            HStack {
                                 Button(action: {
                                     if(self.finishViewing == false) {
                                         self.finishViewing = true
                                     }
+                                    
                                 }) {
                                     Image(systemName: "arrow.left")
                                     Text("Finish Viewing")
@@ -56,40 +56,41 @@ struct HomeScreen: View {
                                 .fixedSize()
                                 .frame(width: 250, height: 45)
                                 .foregroundColor(.white)
-                                .background(Color(red: 38/255.0, green: 50/255.0, blue: 56/255.0, opacity: 1.0))
+                                .background(Color(red: 28/255.0, green: 49/255.0, blue: 58/255.0, opacity: 1.0))
                                 .cornerRadius(25)
-                                .offset(x: 43, y: -13)
-                            }
-                            .offset(y: 150)
-                            
-                            CirclesOfEmotion(radius: 200, text: "Take the Circles of Emotion quiz!")
-                            .offset(x: 280, y: 300)
-                            
-                            // Earthquake video
-                            EarthquakeVideoButton(displayVideo: $displayVideo)
-                            .offset(x: -150, y: -100)
-                            
-                            //Video 1
-                            Video1Button(displayVideo1: $displayVideo1)
-                            .offset(x: -220, y: -100)
-                            
-                            //Video 2
-                            Video2Button(displayVideo2: $displayVideo2)
-                            .offset(x: -220, y: -100)
-                            
-                            //Video 3
-                            Video3Button(displayVideo3: $displayVideo3)
-                            .offset(x: -170, y: -100)
-                            
-                            //Langtang information
-                            AboutLangtang(displayPopup: $displayPopup, choice: $choice)
-                            .offset(x: 280, y: -200)
-                            
-                        }// End VStack
-                        .padding()
-                    }// End ZStack
-                    //.edgesIgnoringSafeArea(.top)
-                }
+                                .shadow(color: Color(red: 30/255.0, green: 50/255.0, blue: 60/255.0, opacity: 0.75), radius: 1, x: 0, y: 3)
+                            }// HStack
+                            .padding()
+                            Spacer()
+                            HStack {
+                                Spacer()
+                                VStack {
+                                    Spacer()
+                                    EarthquakeVideoButton(displayVideo: $displayVideo)
+                                    Spacer()
+                                    Video1Button(displayVideo1: $displayVideo1)
+                                    Spacer()
+                                    Video2Button(displayVideo2: $displayVideo2)
+                                    Spacer()
+                                    Video3Button(displayVideo3: $displayVideo3)
+                                    Spacer()
+                                }// VStack
+                                .padding()
+                                Spacer()
+                                VStack {
+                                    Spacer()
+                                    CirclesOfEmotion(radius: 200, text: "Take the Circles of Emotion quiz!")
+                                    Spacer()
+                                    AboutLangtang(displayPopup: $displayPopup, choice: $choice)
+                                    Spacer()
+                                }// VStack
+                                .padding()
+                                Spacer()
+                            }// HStack
+                            Spacer()
+                        }// VStack
+                    }// ZStack
+                }// VStack
             }
         }
     }
@@ -121,14 +122,13 @@ struct EarthquakeVideoInformation: View {
                                 Text("Return To Exhibition")
                             }
                         }
-                        //.font(.headline)
-                        //.fontWeight(.semibold)
                         .padding()
                         .fixedSize()
                         .frame(width: 250, height: 45)
                         .foregroundColor(.white)
-                        .background(Color(red: 38/255.0, green: 50/255.0, blue: 56/255.0, opacity: 1.0))
+                        .background(Color(red: 28/255.0, green: 49/255.0, blue: 58/255.0, opacity: 1.0))
                         .cornerRadius(25)
+                        .shadow(color: Color(red: 30/255.0, green: 50/255.0, blue: 60/255.0, opacity: 0.75), radius: 1, x: 0, y: 3)
                         Spacer()
 
                         VStack{
@@ -193,8 +193,9 @@ struct Video1Information: View {
                     .fixedSize()
                     .frame(width: 250, height: 45)
                     .foregroundColor(.white)
-                    .background(Color(red: 38/255.0, green: 50/255.0, blue: 56/255.0, opacity: 1.0))
+                    .background(Color(red: 28/255.0, green: 49/255.0, blue: 58/255.0, opacity: 1.0))
                     .cornerRadius(25)
+                    .shadow(color: Color(red: 30/255.0, green: 50/255.0, blue: 60/255.0, opacity: 0.75), radius: 1, x: 0, y: 3)
                     Spacer()
 
                     VStack{
@@ -257,8 +258,9 @@ struct Video2Information: View {
                     .fixedSize()
                     .frame(width: 250, height: 45)
                     .foregroundColor(.white)
-                    .background(Color(red: 38/255.0, green: 50/255.0, blue: 56/255.0, opacity: 1.0))
+                    .background(Color(red: 28/255.0, green: 49/255.0, blue: 58/255.0, opacity: 1.0))
                     .cornerRadius(25)
+                    .shadow(color: Color(red: 30/255.0, green: 50/255.0, blue: 60/255.0, opacity: 0.75), radius: 1, x: 0, y: 3)
                     Spacer()
 
                     VStack{
@@ -321,8 +323,9 @@ struct Video3Information: View {
                     .fixedSize()
                     .frame(width: 250, height: 45)
                     .foregroundColor(.white)
-                    .background(Color(red: 38/255.0, green: 50/255.0, blue: 56/255.0, opacity: 1.0))
+                    .background(Color(red: 28/255.0, green: 49/255.0, blue: 58/255.0, opacity: 1.0))
                     .cornerRadius(25)
+                    .shadow(color: Color(red: 30/255.0, green: 50/255.0, blue: 60/255.0, opacity: 0.75), radius: 1, x: 0, y: 3)
                     Spacer()
 
                     VStack{
@@ -363,7 +366,7 @@ struct Video3Information: View {
 struct CirclesOfEmotion: View {
     var radius: Double
     var text: String
-    var kerning: CGFloat = 5.0
+    var kerning: CGFloat = 7.0
     
     private var texts: [(offset: Int, element:Character)] {
         return Array(text.enumerated())
@@ -392,7 +395,7 @@ struct CirclesOfEmotion: View {
                         
                         Image("circle")
                             .shadow(radius: 10)
-                            .rotationEffect(.degrees(60))
+                            .rotationEffect(.degrees(70))
                             .offset(x: -22, y: 15)
                     }.rotationEffect(-self.angle(at: self.texts.count-1)/2)
                         
@@ -544,6 +547,11 @@ struct DisplayText: View {
                             //Text("Return")
                             Image(systemName: "arrow.left")
                                 .font(.title)
+                                .padding()
+                                /*.foregroundColor(.white)
+                                .background(Color(red: 28/255.0, green: 49/255.0, blue: 58/255.0, opacity: 1.0))
+                                .cornerRadius(25)
+                                .shadow(color: Color(red: 30/255.0, green: 50/255.0, blue: 60/255.0, opacity: 0.75), radius: 0.5, x: 0, y: 2)*/
                         }
                         .padding()
                     }
@@ -628,6 +636,7 @@ struct Video1Button: View {
                             Circle().stroke(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0), lineWidth: 4))
                         .shadow(radius: 10)
                     Text("Stories from Langtang")
+                    .lineLimit(1)
                 }
             }// End button
                 //.sheet(isPresented: self.$displayPopup) {
@@ -641,7 +650,6 @@ struct Video1Button: View {
 struct Video2Button: View {
     
     @Binding var displayVideo2: Bool
-    //@Binding var choice: Int
     
     var body: some View {
         Group {
@@ -649,21 +657,17 @@ struct Video2Button: View {
                 if(self.displayVideo2 == false) {
                     self.displayVideo2 = true
                 }
-                //self.displayPopup = true
-                //self.choice = 1
             }) {
                 HStack {
                     Image("preview.2")
                         .clipShape(Circle())
-                        .overlay(
-                            Circle().stroke(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0), lineWidth: 4))
+                        /*.overlay(
+                            Circle().stroke(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0), lineWidth: 4))*/
                         .shadow(radius: 10)
                     Text("Stories from Langtang")
+                    .lineLimit(1)
                 }
-            }// End button
-                //.sheet(isPresented: self.$displayPopup) {
-                    //PopUp(choice: self.$choice)
-            //}
+            }
             .buttonStyle(PlainButtonStyle())
         }
     }
@@ -690,6 +694,7 @@ struct Video3Button: View {
                             Circle().stroke(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0), lineWidth: 4))
                         .shadow(radius: 10)
                     Text("Stories from Langtang")
+                    .lineLimit(1)
                 }
             }// End button
                 //.sheet(isPresented: self.$displayPopup) {

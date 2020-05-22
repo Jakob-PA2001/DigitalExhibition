@@ -9,12 +9,14 @@
 import SwiftUI
 import Foundation
 import CoreData
+import Network
 
 class UserDBManager: NSObject {
     
     var products: [NSManagedObject] = []
+    let monitor = NWPathMonitor()
     
-    func addUser(username:String, password:String) {
+    func addUser(username:String, password:String, location: String) {
         // set the core data to access the Product Entity
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             return }
@@ -25,6 +27,7 @@ class UserDBManager: NSObject {
         
         product.setValue(username,  forKey: "username")
         product.setValue(password, forKey: "password")
+        product.setValue(location,  forKey: "location")
         
         do {
             products.append(product)
@@ -65,6 +68,7 @@ class UserDBManager: NSObject {
     struct userAttr {
       let username : String
       let password : String
+      let location : String
     }
     
     func retrieveUserAttr() -> [UserDBManager.userAttr] {  // return array of Strings
@@ -79,16 +83,16 @@ class UserDBManager: NSObject {
            print("Error While Retrieving from Core Data" + (error as! String) )
        }
        
-       var userList = [userAttr(username: "Username", password: "Password")]
+        var userList = [userAttr(username: "Username", password: "Password", location: "location")]
         
         if(products.isEmpty) {
-            userList.append(userAttr(username: " ", password: " "))
+            userList.append(userAttr(username: " ", password: " ", location: " "))
             
         }
         else {
            for product in products {
                
-               userList.append(userAttr(username: (product.value(forKeyPath: "username") as? String)!, password: (product.value(forKeyPath: "password") as? String)!))
+            userList.append(userAttr(username: (product.value(forKeyPath: "username") as? String)!, password: (product.value(forKeyPath: "password") as? String)!, location: (product.value(forKeyPath: "location") as? String)!))
            }
         }
        return userList
@@ -148,58 +152,117 @@ class UserDBManager: NSObject {
     
     
     func uploadUsers() { // return array of Strings
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-           return}
-        let managedContext = appDelegate.persistentContainer.viewContext
-        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "LocalUsers")
-        do {
-           products  = try managedContext.fetch(fetchRequest)
-        }
-        catch let error as NSError{
-           print("Error While Retrieving from Core Data" + (error as! String) )
-        }
-        if(!products.isEmpty) {
-            let url = URL(string: "https://pa2001.cdms.westernsydney.edu.au/addusers.php")
-            
-            var request = URLRequest(url: url!)
-            request.httpMethod = "POST"
-            
-            var dataString = "secretWord=pa2001" // starting POST string with a secretWord
-            // the POST string
 
-            var msg : [String] = []
+        let queue = DispatchQueue(label: "Monitor")
+        self.monitor.start(queue: queue)
+        
+        self.monitor.pathUpdateHandler = { path in
+        if path.status == .satisfied {
+            print("We're connected!")
             
-            for product in products {
-                msg.append((product.value(forKeyPath: "username") as? String)!)
-                /*dataString = dataString + "&a=\((product.value(forKeyPath: "username") as? String)!)" // replace "username.txt with own declared variable.
-                dataString = dataString + "&b=\((product.value(forKeyPath: "password") as? String)!)" // replace "password.txt with own declared variable.
-                let dataD = dataString.data(using: .utf8) // convert to utf8 string
+            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+               return}
+            let managedContext = appDelegate.persistentContainer.viewContext
+            let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "LocalUsers")
+            do {
+                self.products  = try managedContext.fetch(fetchRequest)
+            }
+            catch let error as NSError{
+               print("Error While Retrieving from Core Data" + (error as! String) )
+            }
+            if(!self.products.isEmpty) {
+                let url = URL(string: "https://pa2001.cdms.westernsydney.edu.au/addusers.php")
                 
-                do
-                {
+                var request = URLRequest(url: url!)
+                request.httpMethod = "POST"
                 
-                    // EXECUTE POST REQUEST
+                var dataString = "secretWord=pa2001" // starting POST string with a secretWord
+                // the POST string
 
-                    let uploadJob = URLSession.shared.uploadTask(with: request, from: dataD)
-                    {
-                        data, response, error in
+                for product in self.products {
+                    //msg.append((product.value(forKeyPath: "username") as? String)!)
+                    if((product.value(forKeyPath: "location") as? String)! == "Offline") {
+                        dataString = dataString + "&a=\((product.value(forKeyPath: "username") as? String)!)" // replace "username.txt with own declared variable.
+                        dataString = dataString + "&b=\((product.value(forKeyPath: "password") as? String)!)" // replace "password.txt with own declared variable.
+                        let dataD = dataString.data(using: .utf8) // convert to utf8 string
                         
-                       
+                        do
+                        {
+                            // EXECUTE POST REQUEST
+                            let uploadJob = URLSession.shared.uploadTask(with: request, from: dataD)
+                            {
+                                data, response, error in
+                            }
+                            uploadJob.resume()
+                            dataString = "secretWord=pa2001"
+                        }
+                        self.UpdateUserLocation(username: (product.value(forKeyPath: "username") as? String)!)
                     }
-                    uploadJob.resume()
-                    dataString = "secretWord=pa2001"
-                }*/
-            }//for
-            
-            //let onlineUsernames = OnlineUserDB().DownloadUsers()
-            //let difference = onlineUsernames.difference(from: msg)
-            //print(onlineUsernames)
-            //print("Dif: \(difference)")
-            //print(msg)
+                }//for
+            }
+        } else {
+            print("No connection.")
+        }
+
+        print(path.isExpensive)
         }
         // convert POST string to utf8 format
         
     }
+    
+    func UpdateUserLocation(username:String) {
+         // set the core data to access the Product Entity
+        let location = "Online"
+         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+             return }
+         let managedContext = appDelegate.persistentContainer.viewContext
+        
+         let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "LocalUsers")
+         do {
+             let searchQuery = username
+             fetchRequest.predicate = NSPredicate(format: "username == %@", searchQuery)
+             products  = try managedContext.fetch(fetchRequest)
+         }
+         catch let error as NSError{
+             print("Error While Retrieving from Core Data" + (error as! String) )
+         }
+
+         for product in products {
+             product.setValue(location,  forKey: "location")
+            
+              do {
+                  products.append(product)
+                  try managedContext.save()
+             //     showMessage("Information is added")
+              }
+              catch let error as NSError {
+                  print("Error While Adding to Core Data: " + (error as! String) )
+              }
+         }
+         //product.setValue(username,  forKey: "username")
+         //product.setValue(password, forKey: "password")
+         
+    }
+    
+    //DELETES ALL USER DATA - FOR DEBUGGING ONLY
+    func DeleteAll() {        // delete an item based on key: name
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "LocalUsers")
+        do {
+            products  = try managedContext.fetch(fetchRequest)
+            for product in products {
+                managedContext.delete(product)
+            }
+        }
+        catch { }
+        do {
+            try managedContext.save()
+        }
+            catch {  }
+    }
+
 }
 
 extension Array where Element: Hashable {

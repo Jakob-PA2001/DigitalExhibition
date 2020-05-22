@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		840055AA2476324600AA9671 /* nationalities.json in Resources */ = {isa = PBXBuildFile; fileRef = 840055A92476324600AA9671 /* nationalities.json */; };
-		84010A322474E011005E006C /* NetStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84010A312474E011005E006C /* NetStatus.swift */; };
 		840A7AA9246E64C500FB03AE /* TestScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840A7AA8246E64C500FB03AE /* TestScreen.swift */; };
 		8419BC062472705600CDA74A /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8419BC052472705600CDA74A /* VideoView.swift */; };
 		8419BC082472707400CDA74A /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8419BC072472707300CDA74A /* Utility.swift */; };
@@ -53,7 +52,6 @@
 
 /* Begin PBXFileReference section */
 		840055A92476324600AA9671 /* nationalities.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = nationalities.json; path = ../../../nationalities.json; sourceTree = "<group>"; };
-		84010A312474E011005E006C /* NetStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetStatus.swift; sourceTree = "<group>"; };
 		840A7AA8246E64C500FB03AE /* TestScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestScreen.swift; sourceTree = "<group>"; };
 		8419BC052472705600CDA74A /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		8419BC072472707300CDA74A /* Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
@@ -136,10 +134,9 @@
 				848C7A762459559E000C4017 /* AppDelegate.swift */,
 				84FBE6AD2469031000F7DDFC /* DigitalExhibition.xcdatamodeld */,
 				8419BC0B247275A300CDA74A /* SurveyDBManager.swift */,
-				84010A312474E011005E006C /* NetStatus.swift */,
 				848BD4882473A3FA00BB7795 /* UserDBManager.swift */,
-				845027DD2476450C00214F6D /* NationalityDBManager.swift */,
 				84D4B005247414FF006134D8 /* OnlineUserDB.swift */,
+				845027DD2476450C00214F6D /* NationalityDBManager.swift */,
 				848C7A782459559E000C4017 /* SceneDelegate.swift */,
 				848C7A7A2459559E000C4017 /* ContentView.swift */,
 				841EC9C9245FF842007D6D3D /* SplashScreen.swift */,
@@ -332,7 +329,6 @@
 				848C7A792459559E000C4017 /* SceneDelegate.swift in Sources */,
 				845027DE2476450C00214F6D /* NationalityDBManager.swift in Sources */,
 				84FBE6AF2469031000F7DDFC /* DigitalExhibition.xcdatamodeld in Sources */,
-				84010A322474E011005E006C /* NetStatus.swift in Sources */,
 				840A7AA9246E64C500FB03AE /* TestScreen.swift in Sources */,
 				848C7A7B2459559E000C4017 /* ContentView.swift in Sources */,
 				841EC9CC245FF86E007D6D3D /* SurveyScreen.swift in Sources */,
