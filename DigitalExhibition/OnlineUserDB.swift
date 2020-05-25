@@ -79,12 +79,15 @@ class OnlineUserDB: NSObject, URLSessionDataDelegate {
     }//func
     
     func DeleteUser(username:String, password:String) {// return array of Strings
+        print("Debug: " + username)
+        print("Debug: " + password)
         let queue = DispatchQueue(label: "Monitor")
         self.monitor.start(queue: queue)
         
+        print("?")
         self.monitor.pathUpdateHandler = { path in
         if path.status == .satisfied {
-            print("We're connected!")
+            print("DELETE: We're connected!")
             let url = URL(string: "https://pa2001.cdms.westernsydney.edu.au/deleteusers.php")
             
             var request = URLRequest(url: url!)
@@ -99,6 +102,7 @@ class OnlineUserDB: NSObject, URLSessionDataDelegate {
                 //msg.append((product.value(forKeyPath: "username") as? String)!)
             dataString = dataString + "&a=\(username)" // replace "username.txt with own declared variable.
             dataString = dataString + "&b=\(password)" // replace "password.txt with own declared variable.
+            print(dataString)
             let dataD = dataString.data(using: .utf8) // convert to utf8 string
             
             do

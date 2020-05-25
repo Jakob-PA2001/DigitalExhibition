@@ -29,7 +29,7 @@ if sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AU
           print("cannot create users table on load: \(er)")
       }
     
-    if sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS videos (videoNo INTEGER PRIMARY KEY, videoname TEXT,videoURl TEXT, description TEXT)", nil, nil, nil) != SQLITE_OK {
+    if sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS videos (videoNo INTEGER, videoname TEXT,videoURl TEXT,deviceNo TEXT, description TEXT, locDirectory TEXT)", nil, nil, nil) != SQLITE_OK {
         let er = String(cString: sqlite3_errmsg(db)!)
         print("cannot create orders table on load: \(er)")
     }
@@ -64,9 +64,7 @@ func QueryDatabase(query : String){
     var stmt: OpaquePointer?
          //insert
     let str = NSString .localizedStringWithFormat(query as NSString)
-                  
-           //  let str = NSString .localizedStringWithFormat("DELETE FROM Dishes WHERE name = 'name'" )
-              let queryString = String(str)
+                                let queryString = String(str)
 
               if sqlite3_prepare(db, queryString, -1, &stmt, nil) != SQLITE_OK{
                   let errmsg = String(cString: sqlite3_errmsg(db)!)
@@ -76,7 +74,7 @@ func QueryDatabase(query : String){
               
               if sqlite3_step(stmt) != SQLITE_DONE {
                   let errmsg = String(cString: sqlite3_errmsg(db)!)
-                  print("failure quering database: \(errmsg)")
+                  print("failure quering database: \(errmsg) " + query)
                   return
               }
     
@@ -87,10 +85,9 @@ func QueryDatabase(query : String){
 
 //videoNo INTEGER PRIMARY KEY, videoname TEXT,videoURl TEXT, description TEXT)"//
 
-
-let URL_GET_VIDEO:String = "https://pa2001.cdms.westernsydney.edu.au/databaseGettest/getvideos.php" //php to retireve usersdatabase
 func SyncVideoDatabase(){
-    //Sync server video database --> local user database
+   var err = false
+    //Sync server video database --> local user database, local video database gets erased
               print("Syncing Video Database")
                      //created NSURL
               let requestURL = Foundation.URL(string: URL_GET_VIDEO)
@@ -99,12 +96,21 @@ func SyncVideoDatabase(){
                     //setting the method to post
               request.httpMethod = "GET"
               //creating a task to send the post request
+    
+    
+  
               let task = URLSession.shared.dataTask(with: request as URLRequest){
                      data, response, error in if error != nil{
 
                          print("error is \(error)")
-                   
+                        videodesc = "Internet connection appears to be offline, Error Connecting to server"
+                       err = true
                      }
+                
+                
+        
+                
+                if (err == false){
                   QueryDatabase(query: "DELETE FROM videos")//delete local database, resync from server
                    
                      //parsing the response
@@ -125,31 +131,28 @@ func SyncVideoDatabase(){
                           let videoName:String = ((video[i] as! NSDictionary)["videoName"] as! String?)!
                             let videoUrl:String = ((video[i] as! NSDictionary)["videoUrl"] as! String?)!
                             let deviceNo:String = ((video[i] as! NSDictionary)["deviceNo"] as! String?)!
-                             let Description:String = ((video[i] as! NSDictionary)["Description"] as! String?)!
+                             let Description:String = ((video[i] as! NSDictionary)["description"] as! String?)!
+                              let locDirectory:String = ((video[i] as! NSDictionary)["locDirectory"] as! String?)!
                             
                             print(videoNo, " added")
-                            let str = NSString .localizedStringWithFormat("INSERT INTO videos(videoNo, videoname,videoURL, description) VALUES('%@', '%@', '%@','%@')", String(videoNo), videoName,videoUrl,Description)
+                            let str = NSString .localizedStringWithFormat("INSERT INTO videos(videoNo, videoname,videoURL,deviceNo, description,locDirectory) VALUES('%@', '%@', '%@','%@','%@','%@')", String(videoNo), videoName,videoUrl,deviceNo,Description,locDirectory)
                                 QueryDatabase(query: str as String)
                  
                          }
                              } catch {
                                      print(error)
                              } //doend
-                     
-         
-                  
+                }
                  }
-         
-                      task.resume()
+         task.resume()
+            
 
               
        
          
          
 }
-
-func returnVideoNo(row : intmax_t, coloumname : String)-> String{ //returns video database (coloumn name) according to input row.
-    var size = 0
+func getVideoNoInfo(videono : Int, deviceNum : String, coloumname : String) -> String{//return information of videoNo if database.deviceNo == the devicenumber
     var ge: OpaquePointer?
               let queryStringz = "SELECT * FROM videos"
                       if sqlite3_prepare(db, queryStringz, -1, &ge, nil) != SQLITE_OK{
@@ -161,7 +164,51 @@ func returnVideoNo(row : intmax_t, coloumname : String)-> String{ //returns vide
                           let videoNo = sqlite3_column_int(ge, 0)
                           let videoName = String(cString: sqlite3_column_text(ge, 1))
                           let videoUrl = String(cString: sqlite3_column_text(ge, 2))
-                          let Description = String(cString: sqlite3_column_text(ge, 3))
+                             let deviceNo = String(cString: sqlite3_column_text(ge, 3))
+                          let Description = String(cString: sqlite3_column_text(ge, 4))
+                         let locDirectory = String(cString: sqlite3_column_text(ge, 5)) //local directory of server
+                        if(videoNo == videono && deviceNum == deviceNo){
+                            if(coloumname == "videono"){
+                                return String(videoNo)
+                            }else if (coloumname == "videoname"){
+                                return videoName
+                            }else if (coloumname == "videoUrl"){
+                                return videoUrl
+                            }else if (coloumname == "description"){
+                                return Description
+                            }else if (coloumname == "deviceno"){
+                                return deviceNo
+                            }
+                            else if (coloumname == "locDirectory"){
+                                return locDirectory
+                            }
+                            
+                        }
+                      }
+    
+    
+    return ""
+    
+}
+
+func returnVideoNo(row : intmax_t, coloumname : String)-> String{ //returns video database (coloumn name) according to input row.
+    var size = 0
+    var ge: OpaquePointer?
+
+              let queryStringz = "SELECT * FROM videos"
+        
+                      if sqlite3_prepare(db, queryStringz, -1, &ge, nil) != SQLITE_OK{
+                          let errmsg = String(cString: sqlite3_errmsg(db)!)
+                          print("error  Retrieving users \(errmsg)")
+                          
+                      }
+                    while(sqlite3_step(ge) == SQLITE_ROW) {
+                          let videoNo = sqlite3_column_int(ge, 0)
+                          let videoName = String(cString: sqlite3_column_text(ge, 1))
+                          let videoUrl = String(cString: sqlite3_column_text(ge, 2))
+                             let deviceNo = String(cString: sqlite3_column_text(ge, 3))
+                          let Description = String(cString: sqlite3_column_text(ge, 4))
+                         let locDirectory = String(cString: sqlite3_column_text(ge, 5)) //local directory of server
                          size+=1
                         if(size == row){
                             if(coloumname == "videono"){
@@ -172,11 +219,17 @@ func returnVideoNo(row : intmax_t, coloumname : String)-> String{ //returns vide
                                 return videoUrl
                             }else if (coloumname == "description"){
                                 return Description
+                            }else if (coloumname == "deviceno"){
+                                return deviceNo
+                            }
+                            else if (coloumname == "locDirectory"){
+                                return locDirectory
                             }
                             
                         }
                       }
     
+  
     return ""
 }
 
@@ -196,9 +249,10 @@ func showvideoDatabase() ->Bool{//print local video database, returns true if en
                      let videoNo = sqlite3_column_int(ge, 0)
                      let videoname = String(cString: sqlite3_column_text(ge, 1))
                      let videoURL = String(cString: sqlite3_column_text(ge, 2))
-                     let description = String(cString: sqlite3_column_text(ge, 3))
+                       let deviceNo = String(cString: sqlite3_column_text(ge, 3))
+                     let description = String(cString: sqlite3_column_text(ge, 4))
                      videoNamecompare = videoname
-                     print(videoNo,videoname,videoURL,description)
+                    print("LocalVideoDatabase: " , videoNo,videoname,videoURL,deviceNo, description)
                  }
              if (videoNamecompare == ""){
                 print("video database is empty")
@@ -215,7 +269,6 @@ func showvideoDatabase() ->Bool{//print local video database, returns true if en
 
 //USERDATABASEMETHODS ******************************************************************************************************************************************************************************************************************
 //
-let URL_GET_USERS:String = "https://pa2001.cdms.westernsydney.edu.au/databaseGettest/getusers.php" //php to retireve usersdatabase
 
 func showuserDatabase() ->Bool{ //show local user database, returns true if entires exist else false.
          var ge: OpaquePointer?
@@ -246,9 +299,7 @@ func insertIntoUsers(username : String , password :String){ //insert users into 
     var stmt: OpaquePointer?
       //insert
       let str = NSString .localizedStringWithFormat("INSERT INTO users(username, password) VALUES('%@', '%@')", username, password)
-               
-        //  let str = NSString .localizedStringWithFormat("DELETE FROM Dishes WHERE name = 'name'" )
-           let queryString = String(str)
+                          let queryString = String(str)
 
            if sqlite3_prepare(db, queryString, -1, &stmt, nil) != SQLITE_OK{
                let errmsg = String(cString: sqlite3_errmsg(db)!)
@@ -268,3 +319,6 @@ struct DatabaseMethod_Previews: PreviewProvider {
         /*@START_MENU_TOKEN@*/Text("Hello, World!")/*@END_MENU_TOKEN@*/
     }
 }
+
+
+

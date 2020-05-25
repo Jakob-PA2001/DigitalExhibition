@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Network
 
 struct SplashScreen: View {
     @State var canExplore = false
@@ -23,9 +24,10 @@ struct SplashScreen: View {
 }
 
 struct Welcome: View {
+    @Binding var canExplore: Bool
     
     @State private var displaySurvey: Bool = false
-    @Binding var canExplore: Bool
+    let monitor = NWPathMonitor()
     
     var body: some View {
         VStack {
@@ -53,8 +55,20 @@ struct Welcome: View {
                             .shadow(color: .gray, radius: 2, x: 0, y: 5)
                             .padding()
                         Button(action: {
-                            //UserDBManager().DeleteAll()
-                            //OnlineUserDB().DownloadUsers()
+                            let queue = DispatchQueue(label: "Monitor")
+                            self.monitor.start(queue: queue)
+                            
+                            self.monitor.pathUpdateHandler = { path in
+                            if path.status == .satisfied {
+                                print("We're connected!")
+                                UserDBManager().DeleteAll()
+                                OnlineUserDB().DownloadUsers()
+                            } else {
+                                print("No connection.")
+                            }
+
+                            print(path.isExpensive)
+                        }
                             if(self.canExplore == false) {
                                 self.canExplore = true
                             }

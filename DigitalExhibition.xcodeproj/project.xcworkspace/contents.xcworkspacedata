@@ -2,6 +2,15 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:DigitalExhibition.xcodeproj">
+      location = "group:Copperplate Regular.ttf">
+   </FileRef>
+   <FileRef
+      location = "group:Herculanum-Regular.ttf">
+   </FileRef>
+   <FileRef
+      location = "group:Metropolis-Regular.otf">
+   </FileRef>
+   <FileRef
+      location = "self:">
    </FileRef>
 </Workspace>
