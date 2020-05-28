@@ -22,7 +22,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         // Create the SwiftUI view that provides the window contents.
         //let contentView = VideoGallery(username: $username)
-        let contentView = HomeScreen()
+        let contentView = SplashScreen()
         databaseCreate()
 
         // Use a UIHostingController as window root view controller.

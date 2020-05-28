@@ -19,15 +19,16 @@ struct VideoGallery: View {
     @State var allowRefresh: Bool = false
     @State var users = UserDBManager().retrieveUserAttr()
     @State var selectedDevice = 1
+    @State var newUsersUploaded = false
     
     var body: some View {
-        SyncVideoDatabase()
+        //check internet before sync
         return Group {
             if(logout) {
                 SplashScreen()
             }
             else {
-                Menu(currentUser: $username, logout: $logout, allowRefresh: $allowRefresh, users: self.$users, selectedDevice: $selectedDevice)
+                Menu(currentUser: $username, logout: $logout, allowRefresh: $allowRefresh, users: self.$users, selectedDevice: $selectedDevice, newUsersUploaded: $newUsersUploaded)
             }
         }
     }// End Body
@@ -40,6 +41,11 @@ struct Menu: View {
     @Binding var allowRefresh: Bool
     @Binding var users: [UserDBManager.userAttr]
     @Binding var selectedDevice: Int
+    @Binding var newUsersUploaded: Bool
+    
+    @State var displayVideoList = videoList
+    @State private var showAlert = false
+    let monitor = NWPathMonitor()
     
     var body: some View {
         NavigationView {
@@ -49,32 +55,47 @@ struct Menu: View {
                     .aspectRatio(contentMode: .fit)
                     .offset(y: -100)
                     .padding(.bottom, -130)
-                HStack() {
-                    Image(systemName: "person.crop.circle.fill")
-                        .font(.title)
-                        .offset(y: -30)
-                    Text(currentUser)
-                        .font(.headline)
-                        .offset(y: -30)
+                HStack {
+                    VStack {
+                        Text("You are logged in as: ")
+                            .font(.custom("Avenirnext-Regular", size: 20))
+                            .offset(x: 40, y: -60)
+                        HStack {
+                            Spacer()
+                            Image(systemName: "person.crop.circle.fill")
+                                .font(.custom("Avenirnext-Regular", size: 20))
+                                .offset(x: 20, y: -60)
+                            Text(currentUser)
+                                .font(.custom("Avenirnext-Regular", size: 20))
+                                .offset(x: 20, y: -60)
+                            Spacer()
+                        }
+                    }
                 }// End HStack
-                .padding(.bottom, -15)
+                .padding(.bottom, -70)
 
                 List{
-                    NavigationLink(destination: Home(currentUser: $currentUser, selectedDevice: $selectedDevice)) {
+                    NavigationLink(destination: Home(currentUser: $currentUser, selectedDevice: $selectedDevice).onAppear() {
+                        DispatchQueue.global().async(execute: {
+                            DispatchQueue.main.sync {
+                                SyncVideoDatabase()
+                            }
+                        })
+                    }) {
                         HStack(alignment: .firstTextBaseline) {
                             Text("Home")
                             Spacer()
                             Image(systemName: "house.fill")
                         }
                     }
-                    NavigationLink(destination: Videos()) {
+                    NavigationLink(destination: Videos(displayVideoList: $displayVideoList)) {
                         HStack(alignment: .firstTextBaseline) {
                             Text("Video Gallery")
                             Spacer()
                             Image(systemName: "video.circle")
                         }
                     }
-                    NavigationLink(destination: UserManagement(currentUser: $currentUser, users: self.$users/*, allowRefresh: $allowRefresh*/)) {
+                    NavigationLink(destination: UserManagement(currentUser: $currentUser, users: self.$users, newUsersUploaded: $newUsersUploaded)) {
                         HStack {
                             Text("User Management")
                             Spacer()
@@ -89,7 +110,10 @@ struct Menu: View {
                         }
                     }
                     Button(action: {
-                        if(self.logout == false) {
+                        if(self.newUsersUploaded) {
+                            self.showAlert = true
+                        }
+                        else {
                             self.logout = true
                         }
                     }) {
@@ -99,9 +123,22 @@ struct Menu: View {
                             Image(systemName: "escape")
                         }
                     }
+                    .alert(isPresented:self.$showAlert) {
+                        Alert(title: Text("New users have not been synced!")
+                        .foregroundColor(Color.red), message: Text("Are you sure you want to logout ?")
+                        .foregroundColor(Color.red), primaryButton: .default(Text("Yes")) {
+                            self.logout = true
+                        }, secondaryButton: .destructive(Text("Cancel")))
+                    }
                 }// End List
             }//End Vstack
-            Home(currentUser: $currentUser, selectedDevice: $selectedDevice)
+            Home(currentUser: $currentUser, selectedDevice: $selectedDevice).onAppear() {
+                DispatchQueue.global().async(execute: {
+                    DispatchQueue.main.sync {
+                        SyncVideoDatabase()
+                    }
+                })
+            }
         }// End NavigationView
     }
 }
@@ -126,7 +163,7 @@ struct Home: View {
                             .font(.title)
                     }
                     List {
-                        Text("You are signed in as: " + currentUser )
+                        Text("You are logged in as: " + currentUser )
                         VStack {
                             Text("Assign device number: ")
                             HStack {
@@ -193,7 +230,7 @@ func addvideos(){
             
                  
        }//for ends, (video database for statement)
-
+        loadvideosScreen()
     }//if database is not empty statement ends
   
     
@@ -236,7 +273,9 @@ func loadvideosScreen(){ //loads array into screen for refresh [videoList] array
     
 }
 var videodesc = "VideoDatabase Retrieved Successfully"
+
 struct Videos: View {
+    @Binding var displayVideoList: [videoAttributes]
     
     @State var allowRefresh: Bool = false
     @State var refreshCount = 0
@@ -244,62 +283,60 @@ struct Videos: View {
     let monitor = NWPathMonitor()
     @State private var showAlert = false
     
+    
     var body: some View {
-        loadvideosScreen()
-        return Group {
-            if(allowRefresh) {
-                Videos()
-            }
-            else {
-                VStack {
-                    //refresh(allowRefresh: $allowRefresh, refreshCount: $refreshCount, refreshIcon: $refreshIcon)
+        //loadvideosScreen()
+        VStack {
 
-                    List(videoList, id: \.videoname) { videoAttributes in
+            List(displayVideoList, id: \.videoname) { videoAttributes in
 
-                        NavigationLink(destination: VideoView(link:  findlocalDir(filename: videoAttributes.Url).absoluteString) ) {
-                                           
-                            Text( videoAttributes.videoname + " \nVideo: " + videoAttributes.videoNo)
-                       //   Text( videoAttributes.description)
-                                             
-                        }.navigationBarTitle(Text("Videos")).navigationBarItems(
-                         trailing: Button(action: {
-                                 let queue = DispatchQueue(label: "Monitor")
-                                 self.monitor.start(queue: queue)
-                                 
-                                 self.monitor.pathUpdateHandler = { path in
-                                 if path.status == .satisfied {
-                                     self.showAlert = false
-                                    self.allowRefresh = true
-                                     print("We're connected!")
-                                 } else {
-                                     self.showAlert = true
-                                     print("No connection.")
-                                 }
-
-                                 print(path.isExpensive)
-                             }
-                             }) {
-                                 Text("Sync Videos")
-                                 Image(systemName: "rays")
-                             }
-                             .alert(isPresented:self.$showAlert) {
-                                 Alert(title: Text("Alert!")
-                                 .foregroundColor(Color.red), message: Text("Please connect to the internet to sync videos.")
-                                 .foregroundColor(Color.red), dismissButton: .default(Text("Ok")))
+                NavigationLink(destination: VideoView(link:  findlocalDir(filename: videoAttributes.Url).absoluteString) ) {
+                                   
+                    Text( videoAttributes.videoname + " \nVideo: " + videoAttributes.videoNo)
+                                     
+                }.navigationBarTitle(Text("Videos")).navigationBarItems(
+                 trailing: Button(action: {
+                         let queue = DispatchQueue(label: "Monitor")
+                         self.monitor.start(queue: queue)
+                         
+                         self.monitor.pathUpdateHandler = { path in
+                         if path.status == .satisfied {
+                            self.showAlert = false
+                            DispatchQueue.global().async(execute: {
+                                DispatchQueue.main.sync {
+                                    SyncVideoDatabase()
+                                }
+                                self.displayVideoList = self.UpdateList()
                             })
-                            
-                            /*.navigationBarItems(
-                         trailing: Button(action: addvideos, label: { Text("SyncVideos") }))//navlink
-                            */
-                         Text("View Video")
+                             print("We're connected!")
+                         } else {
+                             self.showAlert = true
+                             print("No connection.")
+                         }
+
+                         print(path.isExpensive)
+                     }
+                     }) {
+                         Text("Sync Videos")
+                         Image(systemName: "rays")
+                     }
+                     .alert(isPresented:self.$showAlert) {
+                         Alert(title: Text("Alert!")
+                         .foregroundColor(Color.red), message: Text("Please connect to the internet to sync videos.")
+                         .foregroundColor(Color.red), dismissButton: .default(Text("Ok")))
+                    })
+                 Text("View Video")
+        
                 
-                        
-                    }// End List
-                    // Debug test for refresh, if changes in sim, refresh works.
-                    Text(videodesc)
-                }// End VStack
-            }
-        }// End Group
+            }// End List
+            // Debug test for refresh, if changes in sim, refresh works.
+            Text(videodesc)
+        }// End VStack
+    }
+    
+    func UpdateList() -> [videoAttributes]{
+        loadvideosScreen()
+        return videoList
     }
 }
 
@@ -338,6 +375,7 @@ enum ActiveAlert {
 struct UserManagement: View {
     @Binding var currentUser: String
     @Binding var users: [UserDBManager.userAttr]
+    @Binding var newUsersUploaded: Bool
     
     @State private var width: CGFloat? = nil
     @State var showAddView: Bool = false
@@ -350,7 +388,7 @@ struct UserManagement: View {
             VStack {
                 VStack{
                     HStack {
-                        NavigationLink(destination: ShowAddView(users: self.$users)) {
+                        NavigationLink(destination: ShowAddView(users: self.$users, newUsersUploaded: $newUsersUploaded)) {
                                 HStack(alignment: .firstTextBaseline) {
                                     Text("Add User")
                                     Image(systemName: "person.crop.circle.badge.plus")
@@ -391,11 +429,6 @@ struct UserManagement: View {
                             .background(CenteringView())
                         Spacer()
                     }
-                    Text(users.location)
-                        .frame(width: self.width, alignment: .leading)
-                        .lineLimit(1)
-                        .background(CenteringView())
-                    Spacer()
                     if(users.username != "Username") {
                         Button(action: {
                             if(users.username == self.currentUser) {
@@ -479,6 +512,7 @@ struct UserManagement: View {
                             db.uploadUsers()
                             
                         }
+                    self.newUsersUploaded = false
                     self.users = self.UpdateList()
                     })
                 } else {
@@ -507,6 +541,7 @@ struct UserManagement: View {
     func deleteLocalUser(username: String){
         let localDb = UserDBManager()
         localDb.deleteUser(username: username)
+        self.newUsersUploaded = false
         users = UserDBManager().retrieveUserAttr()
     }
 
@@ -521,6 +556,7 @@ struct UserManagement: View {
 
 struct ShowAddView: View {
     @Binding var users: [UserDBManager.userAttr]
+    @Binding var newUsersUploaded: Bool
     
     @State var username = ""
     @State var password = ""
@@ -619,6 +655,7 @@ struct ShowAddView: View {
             self.username = ""
             self.password = ""
             self.confirmPassword = ""
+            newUsersUploaded = true
         }
     }
 }

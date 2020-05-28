@@ -51,17 +51,20 @@ class OnlineUserDB: NSObject, URLSessionDataDelegate {
                     for i in 0 ..< user.count{
                         onlineUsers.append(((user[i] as! NSDictionary)["username"] as! String?)!)
                         onlineUsers.append(((user[i] as! NSDictionary)["password"] as! String?)!)
+                        print(((user[i] as! NSDictionary)["username"] as! String?)! + " : " + ((user[i] as! NSDictionary)["password"] as! String?)!)
                     }
                     let localUsers = UserDBManager().retrieveUsers()
                     if(localUsers.isEmpty) {
                         //Insert online into local
                         let localDb = UserDBManager()
-                        var userCount = 0
-                        var passCount = userCount + 1
-                        while userCount != (onlineUsers.count - 2) {
-                            passCount = userCount + 1
-                            localDb.addUser(username: onlineUsers[userCount], password: onlineUsers[passCount], location: "Online")
-                            userCount += 2
+                        var saveUser = ""
+                        print(onlineUsers.count)
+                        for i in 0 ..< onlineUsers.count {
+                            if i % 2 == 0 {
+                                saveUser = onlineUsers[i]
+                            } else {
+                                localDb.addUser(username: saveUser, password: onlineUsers[i], location: "Online")
+                            }
                         }
                     }// if
                 } catch {

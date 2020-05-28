@@ -156,12 +156,12 @@ class UserDBManager: NSObject {
         let queue = DispatchQueue(label: "Monitor")
         self.monitor.start(queue: queue)
 
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-           return}
         
         self.monitor.pathUpdateHandler = { path in
         if path.status == .satisfied {
             print("We're connected!")
+            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+               return}
             
             let managedContext = appDelegate.persistentContainer.viewContext
             let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "LocalUsers")

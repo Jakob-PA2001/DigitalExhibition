@@ -61,8 +61,12 @@ struct Welcome: View {
                             self.monitor.pathUpdateHandler = { path in
                             if path.status == .satisfied {
                                 print("We're connected!")
-                                UserDBManager().DeleteAll()
-                                OnlineUserDB().DownloadUsers()
+                                DispatchQueue.global().async(execute: {
+                                    DispatchQueue.main.sync {
+                                        UserDBManager().DeleteAll()
+                                    }
+                                    OnlineUserDB().DownloadUsers()
+                                })
                             } else {
                                 print("No connection.")
                             }

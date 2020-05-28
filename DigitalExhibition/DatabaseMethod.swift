@@ -139,6 +139,7 @@ func SyncVideoDatabase(){
                                 QueryDatabase(query: str as String)
                  
                          }
+                        addvideos()
                              } catch {
                                      print(error)
                              } //doend
