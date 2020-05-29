@@ -19,9 +19,12 @@ struct HomeScreen: View {
     @State private var choice: Int = 0
     @State private var finishViewing: Bool = false
     
+    @State var maxTime = 1200
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    
     var body: some View {
         return Group {
-            if(finishViewing) {
+            if(finishViewing || maxTime == 0) {
                 SplashScreen()
             }
             else if(displayVideo) {
@@ -97,8 +100,14 @@ struct HomeScreen: View {
                         }// VStack
                     }// ZStack
                 }// VStack
-                //.edgesIgnoringSafeArea(.top)
             }
+            Text("\(maxTime)")
+                .onReceive(timer) { _ in
+                    if self.maxTime > 0 {
+                        self.maxTime -= 1
+                }
+            }
+            .hidden()
         }
         .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
         .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/2)
@@ -625,9 +634,10 @@ struct DisplayVideo: View {
                 self.presentationMode.wrappedValue.dismiss()
             }) {
                 VStack {
-                    Text("Display Video")
-                    Image(systemName: "arrow.down")
-                        .font(.title)
+                    HStack {
+                        Text("Return")
+                        Image(systemName: "arrow.down")
+                    }.padding()
                 }
                 //.padding()
             }//.padding(.bottom, 50)

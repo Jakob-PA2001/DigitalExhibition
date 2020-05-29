@@ -12,27 +12,70 @@ import Network
 
 //For Testing purposes
 
+let randomInt = Int.random(in: 0...10)
 
 struct TestScreen: View {
-        //@Binding var currentUser: String
-        //@Binding var users: [UserDBManager.userAttr]
-        @State var users = UserDBManager().retrieveUserAttr()
-        @State var currentUser: String = "Jak"
+    @State var leaveTest = false
+    @State var str = "Hello"
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
         
-        @State private var width: CGFloat? = 250.0
-        @State var showAddView: Bool = false
-        @State private var showAlert = false
-        @State private var activeAlert: ActiveAlert = .first
-        let monitor = NWPathMonitor()
-        
-        var body: some View {
-            VStack {
-                Text("Testing...")
-                
-                Button(action: {}) {
-                    Text(/*@START_MENU_TOKEN@*/"Button"/*@END_MENU_TOKEN@*/)
-                }
+    var body: some View {
+        return Group {
+            if leaveTest {
+                SplashScreen()
             }
+            else {
+                ZStack {
+                    Text("Testing...")
+                        .font(.largeTitle)
+                        .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/2)
+                    Button(action: {self.leaveTest.toggle()}) {
+                        Text("Exit")
+                    }
+                    .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/2 + 100)
+                    Text("Hioiiiiiiiii")
+                        .position(x: 100, y: 100)
+                    Text("hello")
+                    .position(x: 150, y: 100)
+                    Text("helloooo")
+                    .position(x: 100, y: 150)
+                    Text("Hello")
+                    .position(x: 200, y: 100)
+                    Text("Hello")
+                    .position(x: 50, y: 200)
+                    Text("Hello")
+                    .position(x: 100, y: 200)
+                    
+                    Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/) {
+                        Text(/*@START_MENU_TOKEN@*/"Button"/*@END_MENU_TOKEN@*/)
+                    }
+                    if leaveTest {
+                        Text("Bye")
+                    }
+                    //.position(x: UIScreen.main.bounds.width/2, y: 0)
+                }
+                /*VStack {
+                    Text("Testing...")
+                        .font(.largeTitle)
+                    Button(action: {self.leaveTest.toggle()}) {
+                        Text("Exit")
+                    }
+                    HStack {
+                        VStack {
+                            Text("Hioiiiiiiiii")
+                        }
+                        .position(x: 100, y: 100)
+                        Text("hello")
+                        Text("helloooo")
+                        HStack {
+                            Text("Hello")
+                            Text("Hello")
+                            Text("Hello")
+                        }
+                    }//.position(x: UIScreen.main.bounds.width/2, y: 0)
+                }*/
+            }
+        }
     }
 }
 

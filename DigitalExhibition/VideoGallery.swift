@@ -20,6 +20,7 @@ struct VideoGallery: View {
     @State var users = UserDBManager().retrieveUserAttr()
     @State var selectedDevice = 1
     @State var newUsersUploaded = false
+    @State private var taps = 0
     
     var body: some View {
         //check internet before sync
@@ -28,7 +29,7 @@ struct VideoGallery: View {
                 SplashScreen()
             }
             else {
-                Menu(currentUser: $username, logout: $logout, allowRefresh: $allowRefresh, users: self.$users, selectedDevice: $selectedDevice, newUsersUploaded: $newUsersUploaded)
+                Menu(currentUser: $username, logout: $logout, allowRefresh: $allowRefresh, users: self.$users, selectedDevice: $selectedDevice, taps: $taps, newUsersUploaded: $newUsersUploaded)
             }
         }
     }// End Body
@@ -41,6 +42,7 @@ struct Menu: View {
     @Binding var allowRefresh: Bool
     @Binding var users: [UserDBManager.userAttr]
     @Binding var selectedDevice: Int
+    @Binding var taps: Int
     @Binding var newUsersUploaded: Bool
     
     @State var displayVideoList = videoList
@@ -65,6 +67,12 @@ struct Menu: View {
                             Image(systemName: "person.crop.circle.fill")
                                 .font(.custom("Avenirnext-Regular", size: 20))
                                 .offset(x: 20, y: -60)
+                                .onTapGesture {
+                                    self.taps += 1
+                                    if ( self.taps == 5) {
+                                        print(String(self.taps))
+                                    }
+                            }
                             Text(currentUser)
                                 .font(.custom("Avenirnext-Regular", size: 20))
                                 .offset(x: 20, y: -60)

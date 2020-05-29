@@ -22,6 +22,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         // Create the SwiftUI view that provides the window contents.
         //let contentView = VideoGallery(username: $username)
+        //let contentView = TestScreen()
         let contentView = SplashScreen()
         databaseCreate()
 

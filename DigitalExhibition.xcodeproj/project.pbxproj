@@ -24,6 +24,7 @@
 		841EC9D02460027E007D6D3D /* LogIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841EC9CF2460027E007D6D3D /* LogIn.swift */; };
 		842219A9246148440079241B /* VideoGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842219A8246148440079241B /* VideoGallery.swift */; };
 		845027DE2476450C00214F6D /* NationalityDBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845027DD2476450C00214F6D /* NationalityDBManager.swift */; };
+		84705A3724812BD7000620F5 /* PAPYRUS.TTF in Resources */ = {isa = PBXBuildFile; fileRef = 84705A3624812BD7000620F5 /* PAPYRUS.TTF */; };
 		848BD4892473A3FA00BB7795 /* UserDBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848BD4882473A3FA00BB7795 /* UserDBManager.swift */; };
 		848C7A772459559E000C4017 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848C7A762459559E000C4017 /* AppDelegate.swift */; };
 		848C7A792459559E000C4017 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848C7A782459559E000C4017 /* SceneDelegate.swift */; };
@@ -33,6 +34,7 @@
 		848C7A83245955A0000C4017 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 848C7A81245955A0000C4017 /* LaunchScreen.storyboard */; };
 		848C7A8E245955A0000C4017 /* DigitalExhibitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848C7A8D245955A0000C4017 /* DigitalExhibitionTests.swift */; };
 		848C7A99245955A0000C4017 /* DigitalExhibitionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848C7A98245955A0000C4017 /* DigitalExhibitionUITests.swift */; };
+		8495E6772480EC74007C2CA7 /* AutoSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8495E6762480EC74007C2CA7 /* AutoSync.swift */; };
 		84D4B006247414FF006134D8 /* OnlineUserDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D4B005247414FF006134D8 /* OnlineUserDB.swift */; };
 		84FBE6AF2469031000F7DDFC /* DigitalExhibition.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 84FBE6AD2469031000F7DDFC /* DigitalExhibition.xcdatamodeld */; };
 /* End PBXBuildFile section */
@@ -72,6 +74,7 @@
 		841EC9CF2460027E007D6D3D /* LogIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogIn.swift; sourceTree = "<group>"; };
 		842219A8246148440079241B /* VideoGallery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoGallery.swift; sourceTree = "<group>"; };
 		845027DD2476450C00214F6D /* NationalityDBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NationalityDBManager.swift; sourceTree = "<group>"; };
+		84705A3624812BD7000620F5 /* PAPYRUS.TTF */ = {isa = PBXFileReference; lastKnownFileType = file; path = PAPYRUS.TTF; sourceTree = "<group>"; };
 		848BD4882473A3FA00BB7795 /* UserDBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDBManager.swift; sourceTree = "<group>"; };
 		848C7A732459559E000C4017 /* DigitalExhibition.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DigitalExhibition.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		848C7A762459559E000C4017 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -87,6 +90,7 @@
 		848C7A94245955A0000C4017 /* DigitalExhibitionUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DigitalExhibitionUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		848C7A98245955A0000C4017 /* DigitalExhibitionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DigitalExhibitionUITests.swift; sourceTree = "<group>"; };
 		848C7A9A245955A0000C4017 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8495E6762480EC74007C2CA7 /* AutoSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoSync.swift; sourceTree = "<group>"; };
 		84D4B005247414FF006134D8 /* OnlineUserDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineUserDB.swift; sourceTree = "<group>"; };
 		84FBE6AE2469031000F7DDFC /* DigitalExhibition.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DigitalExhibition.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -122,6 +126,7 @@
 				8415DDDD247BD58500E311EC /* Copperplate-Regular.ttf */,
 				8415DDE1247BDBE000E311EC /* Herculanum.ttf */,
 				8415DDDB247BD58500E311EC /* Metropolis-Regular.otf */,
+				84705A3624812BD7000620F5 /* PAPYRUS.TTF */,
 			);
 			path = fonts;
 			sourceTree = "<group>";
@@ -152,6 +157,7 @@
 				8415DDDA247BD57A00E311EC /* fonts */,
 				848C7A762459559E000C4017 /* AppDelegate.swift */,
 				84FBE6AD2469031000F7DDFC /* DigitalExhibition.xcdatamodeld */,
+				8495E6762480EC74007C2CA7 /* AutoSync.swift */,
 				8419BC0B247275A300CDA74A /* SurveyDBManager.swift */,
 				848BD4882473A3FA00BB7795 /* UserDBManager.swift */,
 				84D4B005247414FF006134D8 /* OnlineUserDB.swift */,
@@ -311,6 +317,7 @@
 				8415DDE0247BD58600E311EC /* Copperplate-Regular.ttf in Resources */,
 				8415DDDE247BD58600E311EC /* Metropolis-Regular.otf in Resources */,
 				848C7A83245955A0000C4017 /* LaunchScreen.storyboard in Resources */,
+				84705A3724812BD7000620F5 /* PAPYRUS.TTF in Resources */,
 				848C7A80245955A0000C4017 /* Preview Assets.xcassets in Resources */,
 				8415DDE2247BDBE000E311EC /* Herculanum.ttf in Resources */,
 				840D24F92477F57C008D1FFC /* nationalities.json in Resources */,
@@ -350,6 +357,7 @@
 				84D4B006247414FF006134D8 /* OnlineUserDB.swift in Sources */,
 				8419BC082472707400CDA74A /* Utility.swift in Sources */,
 				848C7A792459559E000C4017 /* SceneDelegate.swift in Sources */,
+				8495E6772480EC74007C2CA7 /* AutoSync.swift in Sources */,
 				840D24FB2477F586008D1FFC /* Nationalities.swift in Sources */,
 				845027DE2476450C00214F6D /* NationalityDBManager.swift in Sources */,
 				84FBE6AF2469031000F7DDFC /* DigitalExhibition.xcdatamodeld in Sources */,
