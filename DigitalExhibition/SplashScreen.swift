@@ -7,30 +7,65 @@
 //
 
 import SwiftUI
+import Network
 
 struct SplashScreen: View {
     @State var canExplore = false
+    @State var displaySurvey = false
+    @State var str = ""
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    
     var body: some View {
         return Group {
             if canExplore {
-                SurveyScreen()
+                //SurveyScreen()
+                //TestScreen()
+                //LogIn()
+                FakeView(pass: $canExplore)
             }
             else {
                 Welcome(canExplore: $canExplore)
+            }//if
+
+            Text(str)
+                .onReceive(timer) { _ in
+                    if (self.str == "01:00:00" || self.str == "04:00:00" || self.str == "07:00:00" || self.str == "10:00:00" || self.str == "13:00:00" || self.str == "16:00:00" || self.str == "19:00:00" || self.str == "22:00:00") {
+                        self.str = "Boo"
+                        AutoSync().SyncOptions()
+                    }
+                    else {
+                        self.str = AutoSync().getDate()
+                    }
             }
+            .hidden()
+        }//return
+        //.statusBar(hidden: true)
+    }
+}
+
+struct FakeView: View {
+    @Binding var pass: Bool
+    var body: some View {
+        return Group {
+            if pass {
+                SurveyScreen()
+                //TestScreen()
+            }
+            Text("").hidden()
         }
     }
 }
 
 struct Welcome: View {
+    @Binding var canExplore: Bool
     
     @State private var displaySurvey: Bool = false
-    @Binding var canExplore: Bool
+    let monitor = NWPathMonitor()
     
     var body: some View {
         VStack {
             VStack {
-                HStack {
+                /*HStack {
                     Image("fire.logo")
                         .font(.subheadline)
                         .padding()
@@ -38,44 +73,55 @@ struct Welcome: View {
                     Image("wsu.logo")
                         .font(.subheadline)
                         .padding()
-                }
+                }*/
                 ZStack {
+                    Color(red: 66/255.0, green: 142/255.0, blue: 146/255.0, opacity: 1.0)
                     HStack {
-                        Image("splash")
+                        Image("frontpage")
                         .resizable()
-                        .frame(width: UIScreen.main.bounds.width, height:  UIScreen.main.bounds.height * 3/4)
+                        .frame(width: 1000, height: 611)
                         .aspectRatio(contentMode: .fit)
-                        .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/3)
+                        .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/2)
                     }
                     VStack {
-                        Text("Welcome to the Langtang Heritage Trail")
-                            .font(.largeTitle)
-                            .shadow(color: .gray, radius: 2, x: 0, y: 5)
-                            .padding()
                         Button(action: {
-                            //UserDBManager().DeleteAll()
-                            //OnlineUserDB().DownloadUsers()
+                            let queue = DispatchQueue(label: "Monitor")
+                            self.monitor.start(queue: queue)
+                            
+                            self.monitor.pathUpdateHandler = { path in
+                            if path.status == .satisfied {
+                                print("We're connected!")
+                                DispatchQueue.global().async(execute: {
+                                    DispatchQueue.main.sync {
+                                        UserDBManager().DeleteAll()
+                                    }
+                                    OnlineUserDB().DownloadUsers()
+                                })
+                            } else {
+                                print("No connection.")
+                            }
+
+                            print(path.isExpensive)
+                        }
                             if(self.canExplore == false) {
                                 self.canExplore = true
                             }
                         }) {
-                                Text("EXPLORE")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
+                                Text("Enter")
+                                    .font(.custom("Papyrus", size: 48))
                                     .padding()
                                     .fixedSize()
-                                    .frame(width: 140, height: 45)
-                                    .foregroundColor(.white)
-                                    .background(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0))
-                                    .cornerRadius(25)
-                                    .shadow(color: .gray, radius: 2, x: 0, y: 5)
+                                    .frame(width: 180, height: 110)
+                                    .foregroundColor(.black)
+                                    .background(Color(red: 241/255.0, green: 248/255.0, blue: 233/255.0, opacity: 1.0))
+                                    .cornerRadius(8)
                             
                         }
                     }
-                    .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/3)
+                    .position(x: 265, y: 590)
                 }
             }
-        }
+        }//VStack
     }
 }
 

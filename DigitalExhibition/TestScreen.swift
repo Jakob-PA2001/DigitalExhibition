@@ -12,61 +12,70 @@ import Network
 
 //For Testing purposes
 
+let randomInt = Int.random(in: 0...10)
 
 struct TestScreen: View {
-    
+    @State var leaveTest = false
+    @State var str = "Hello"
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+        
     var body: some View {
-        VStack {
-            ZStack {
-                Color(red: 66/255.0, green: 142/255.0, blue: 146/255.0, opacity: 1.0)
-                VStack {
+        return Group {
+            if leaveTest {
+                SplashScreen()
+            }
+            else {
+                ZStack {
+                    Text("Testing...")
+                        .font(.largeTitle)
+                        .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/2)
+                    Button(action: {self.leaveTest.toggle()}) {
+                        Text("Exit")
+                    }
+                    .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/2 + 100)
+                    Text("Hioiiiiiiiii")
+                        .position(x: 100, y: 100)
+                    Text("hello")
+                    .position(x: 150, y: 100)
+                    Text("helloooo")
+                    .position(x: 100, y: 150)
+                    Text("Hello")
+                    .position(x: 200, y: 100)
+                    Text("Hello")
+                    .position(x: 50, y: 200)
+                    Text("Hello")
+                    .position(x: 100, y: 200)
+                    
+                    Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/) {
+                        Text(/*@START_MENU_TOKEN@*/"Button"/*@END_MENU_TOKEN@*/)
+                    }
+                    if leaveTest {
+                        Text("Bye")
+                    }
+                    //.position(x: UIScreen.main.bounds.width/2, y: 0)
+                }
+                /*VStack {
+                    Text("Testing...")
+                        .font(.largeTitle)
+                    Button(action: {self.leaveTest.toggle()}) {
+                        Text("Exit")
+                    }
                     HStack {
-                        Button(action: {}) {
-                            Image(systemName: "arrow.left")
-                            Text("Finish Viewing")
+                        VStack {
+                            Text("Hioiiiiiiiii")
                         }
-                        .padding()
-                        .fixedSize()
-                        .frame(width: 250, height: 45)
-                        .foregroundColor(.white)
-                        .background(Color(red: 28/255.0, green: 49/255.0, blue: 58/255.0, opacity: 1.0))
-                        .cornerRadius(25)
-                        .shadow(color: Color(red: 30/255.0, green: 50/255.0, blue: 60/255.0, opacity: 0.75), radius: 1, x: 0, y: 3)
-                    }// HStack
-                    .padding()
-                    Spacer()
-                    HStack {
-                        Spacer()
-                        VStack {
-                            Spacer()
-                            Text("EEE")
-                            Spacer()
-                            Text("111")
-                            Spacer()
-                            Text("222")
-                            Spacer()
-                            Text("333")
-                            Spacer()
-                        }// VStack
-                        .padding()
-                        Spacer()
-                        VStack {
-                            Spacer()
-                            Text("Circle")
-                            Spacer()
-                            Text("About")
-                            Spacer()
-                        }// VStack
-                        .padding()
-                        Spacer()
-                    }// HStack
-                    Spacer()
-                }// VStack
-            }// ZStack
-        }// VStack
-    }// End Body
-    
-    func test() {
+                        .position(x: 100, y: 100)
+                        Text("hello")
+                        Text("helloooo")
+                        HStack {
+                            Text("Hello")
+                            Text("Hello")
+                            Text("Hello")
+                        }
+                    }//.position(x: UIScreen.main.bounds.width/2, y: 0)
+                }*/
+            }
+        }
     }
 }
 

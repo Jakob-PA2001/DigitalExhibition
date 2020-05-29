@@ -51,17 +51,20 @@ class OnlineUserDB: NSObject, URLSessionDataDelegate {
                     for i in 0 ..< user.count{
                         onlineUsers.append(((user[i] as! NSDictionary)["username"] as! String?)!)
                         onlineUsers.append(((user[i] as! NSDictionary)["password"] as! String?)!)
+                        print(((user[i] as! NSDictionary)["username"] as! String?)! + " : " + ((user[i] as! NSDictionary)["password"] as! String?)!)
                     }
                     let localUsers = UserDBManager().retrieveUsers()
                     if(localUsers.isEmpty) {
                         //Insert online into local
                         let localDb = UserDBManager()
-                        var userCount = 0
-                        var passCount = userCount + 1
-                        while userCount != (onlineUsers.count - 2) {
-                            passCount = userCount + 1
-                            localDb.addUser(username: onlineUsers[userCount], password: onlineUsers[passCount], location: "Online")
-                            userCount += 2
+                        var saveUser = ""
+                        print(onlineUsers.count)
+                        for i in 0 ..< onlineUsers.count {
+                            if i % 2 == 0 {
+                                saveUser = onlineUsers[i]
+                            } else {
+                                localDb.addUser(username: saveUser, password: onlineUsers[i], location: "Online")
+                            }
                         }
                     }// if
                 } catch {
@@ -79,12 +82,15 @@ class OnlineUserDB: NSObject, URLSessionDataDelegate {
     }//func
     
     func DeleteUser(username:String, password:String) {// return array of Strings
+        print("Debug: " + username)
+        print("Debug: " + password)
         let queue = DispatchQueue(label: "Monitor")
         self.monitor.start(queue: queue)
         
+        print("?")
         self.monitor.pathUpdateHandler = { path in
         if path.status == .satisfied {
-            print("We're connected!")
+            print("DELETE: We're connected!")
             let url = URL(string: "https://pa2001.cdms.westernsydney.edu.au/deleteusers.php")
             
             var request = URLRequest(url: url!)
@@ -99,6 +105,7 @@ class OnlineUserDB: NSObject, URLSessionDataDelegate {
                 //msg.append((product.value(forKeyPath: "username") as? String)!)
             dataString = dataString + "&a=\(username)" // replace "username.txt with own declared variable.
             dataString = dataString + "&b=\(password)" // replace "password.txt with own declared variable.
+            print(dataString)
             let dataD = dataString.data(using: .utf8) // convert to utf8 string
             
             do

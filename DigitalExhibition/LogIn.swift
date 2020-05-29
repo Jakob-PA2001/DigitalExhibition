@@ -102,31 +102,8 @@ struct LoginForm: View {
                     HStack {
                         Spacer()
                         Button(action: {
-                       
-                                                    
-                        
-                          //  addusers()
-                            //self.displayError = false
                             self.confirmUser(enteredUsername: self.username, enteredPassword: self.password)
                             
-                            /*if (showuserDatabase()==false){
-                                print("Database is empty")
-                                errormessage = "Syncing ,user database empty, please try again in a few moments!"
-                                syncUserzDatabase()
-                                self.displayError = true
-                            }else{
-
-                               // getTableSize(tablename: "users")
-                                if (authenticate(USERNAME: self.username, PASSWORD: self.password) == true ){
-
-                                    
-                                   self.canSignIn = true
-                                  
-                                }else{
-                                    errormessage = "Incorrect Username/Password"
-                                }
-                                  self.displayError = true
-                            }*/
                         }) {
                             Text("Sign in")
                             .font(.headline)

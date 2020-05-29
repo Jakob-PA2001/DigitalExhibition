@@ -9,6 +9,8 @@
 import SwiftUI
 import CoreData
 import Network
+let initialDeviceNo = "Device2"
+var LocaldeviceNo = initialDeviceNo
 
 struct VideoGallery: View {
     @Binding var username: String
@@ -16,14 +18,18 @@ struct VideoGallery: View {
     @State private var logout: Bool = false
     @State var allowRefresh: Bool = false
     @State var users = UserDBManager().retrieveUserAttr()
+    @State var selectedDevice = 1
+    @State var newUsersUploaded = false
+    @State private var taps = 0
     
     var body: some View {
+        //check internet before sync
         return Group {
             if(logout) {
                 SplashScreen()
             }
             else {
-                Menu(currentUser: $username, logout: $logout, allowRefresh: $allowRefresh, users: self.$users)
+                Menu(currentUser: $username, logout: $logout, allowRefresh: $allowRefresh, users: self.$users, selectedDevice: $selectedDevice, taps: $taps, newUsersUploaded: $newUsersUploaded)
             }
         }
     }// End Body
@@ -35,6 +41,13 @@ struct Menu: View {
     @Binding var logout: Bool
     @Binding var allowRefresh: Bool
     @Binding var users: [UserDBManager.userAttr]
+    @Binding var selectedDevice: Int
+    @Binding var taps: Int
+    @Binding var newUsersUploaded: Bool
+    
+    @State var displayVideoList = videoList
+    @State private var showAlert = false
+    let monitor = NWPathMonitor()
     
     var body: some View {
         NavigationView {
@@ -44,25 +57,53 @@ struct Menu: View {
                     .aspectRatio(contentMode: .fit)
                     .offset(y: -100)
                     .padding(.bottom, -130)
-                HStack() {
-                    Image(systemName: "person.crop.circle.fill")
-                        .font(.title)
-                        .offset(y: -30)
-                    Text(currentUser)
-                        .font(.headline)
-                        .offset(y: -30)
+                HStack {
+                    VStack {
+                        Text("You are logged in as: ")
+                            .font(.custom("Avenirnext-Regular", size: 20))
+                            .offset(x: 40, y: -60)
+                        HStack {
+                            Spacer()
+                            Image(systemName: "person.crop.circle.fill")
+                                .font(.custom("Avenirnext-Regular", size: 20))
+                                .offset(x: 20, y: -60)
+                                .onTapGesture {
+                                    self.taps += 1
+                                    if ( self.taps == 5) {
+                                        print(String(self.taps))
+                                    }
+                            }
+                            Text(currentUser)
+                                .font(.custom("Avenirnext-Regular", size: 20))
+                                .offset(x: 20, y: -60)
+                            Spacer()
+                        }
+                    }
                 }// End HStack
-                .padding(.bottom, -15)
+                .padding(.bottom, -70)
 
                 List{
-                    NavigationLink(destination: Videos(allowRefresh: $allowRefresh)) {
+                    NavigationLink(destination: Home(currentUser: $currentUser, selectedDevice: $selectedDevice).onAppear() {
+                        DispatchQueue.global().async(execute: {
+                            DispatchQueue.main.sync {
+                                SyncVideoDatabase()
+                            }
+                        })
+                    }) {
+                        HStack(alignment: .firstTextBaseline) {
+                            Text("Home")
+                            Spacer()
+                            Image(systemName: "house.fill")
+                        }
+                    }
+                    NavigationLink(destination: Videos(displayVideoList: $displayVideoList)) {
                         HStack(alignment: .firstTextBaseline) {
                             Text("Video Gallery")
                             Spacer()
                             Image(systemName: "video.circle")
                         }
                     }
-                    NavigationLink(destination: UserManagement(currentUser: $currentUser, users: self.$users)) {
+                    NavigationLink(destination: UserManagement(currentUser: $currentUser, users: self.$users, newUsersUploaded: $newUsersUploaded)) {
                         HStack {
                             Text("User Management")
                             Spacer()
@@ -77,7 +118,10 @@ struct Menu: View {
                         }
                     }
                     Button(action: {
-                        if(self.logout == false) {
+                        if(self.newUsersUploaded) {
+                            self.showAlert = true
+                        }
+                        else {
                             self.logout = true
                         }
                     }) {
@@ -87,12 +131,81 @@ struct Menu: View {
                             Image(systemName: "escape")
                         }
                     }
+                    .alert(isPresented:self.$showAlert) {
+                        Alert(title: Text("New users have not been synced!")
+                        .foregroundColor(Color.red), message: Text("Are you sure you want to logout ?")
+                        .foregroundColor(Color.red), primaryButton: .default(Text("Yes")) {
+                            self.logout = true
+                        }, secondaryButton: .destructive(Text("Cancel")))
+                    }
                 }// End List
             }//End Vstack
+            Home(currentUser: $currentUser, selectedDevice: $selectedDevice).onAppear() {
+                DispatchQueue.global().async(execute: {
+                    DispatchQueue.main.sync {
+                        SyncVideoDatabase()
+                    }
+                })
+            }
         }// End NavigationView
     }
 }
 
+struct Home: View {
+    @Binding var currentUser: String
+    @State var allowRefresh: Bool = false
+    @State var refreshCount = 0
+    
+    let deviceNo = ["Device1", "Device2", "Device3"]
+    @Binding var selectedDevice: Int
+    
+    var body: some View {
+        Group {
+            if( allowRefresh ) {
+                Home(currentUser: $currentUser, selectedDevice: $selectedDevice)
+            }
+            else {
+                VStack {
+                    HStack {
+                        Text("Home")
+                            .font(.title)
+                    }
+                    List {
+                        Text("You are logged in as: " + currentUser )
+                        VStack {
+                            Text("Assign device number: ")
+                            HStack {
+                                Picker(selection: $selectedDevice, label: Text("Device: ")) {
+                                    ForEach(0 ..< deviceNo.count) {
+                                        Text(self.deviceNo[$0])
+                                    }
+                                }.pickerStyle(SegmentedPickerStyle())
+                                    .labelsHidden()
+                            }
+                            Button(action: {
+                                LocaldeviceNo = self.deviceNo[self.selectedDevice]
+                                self.allowRefresh = true
+                            }) {
+                                Text("Assign")
+                                    .foregroundColor(Color.blue)
+                            }
+                        }
+                        Text("Current device number: " + LocaldeviceNo )
+                        
+                        Text("Video Database size: " + String(getTableSize(tablename: "videos")))
+                    }
+                }
+            }
+        }
+    }
+}
+
+func checkDeviceno()-> Bool{ //checks if localdeviceNo is empty or not. false = empty else true
+    if (LocaldeviceNo == ""){
+        return false
+    }
+    return true
+}
 
 struct videoAttributes {
   let videoname: String
@@ -101,83 +214,165 @@ struct videoAttributes {
   let Url : String
 }
 var videoList = [
-    videoAttributes(videoname: "kwUNhM2A3nT4WPsOF0WYjZPtxJwt6mFABh0724FP.mp4", description: "afd", videoNo: "afd", Url: ""),
+    videoAttributes(videoname: "EmptyVideos.", description: "", videoNo: "Please Sync from server", Url: ""),
 ]
 
 func addvideos(){
+    print("adding video to array...")
     
-    print("Syncing video database from server...")
-    
-    SyncVideoDatabase() //sync server database files
-    
-    if(showvideoDatabase()==true){ // if database is not empty
-           videoList.removeAll()
+    videodesc = ("downloading video for device: " + LocaldeviceNo)
+    if(showvideoDatabase()==true){ // if database is not empty, go through and download videos if matching device No
+           videoList.removeAll() //remove all previous records of display video records
              print("Syncing complete, Download videos from server")
-        var videosize = getTableSize(tablename: "videos")
-             for n in 1 ... videosize{
-                print("downloading video:", n,"/",videosize)
+        
+        
+            var videosize = getTableSize(tablename: "videos")  //get table size of video database
+             for n in 1 ... videosize{  //forloop to go through all videodatabase record
+                print(returnVideoNo(row: n, coloumname: "deviceno"))
+                if (returnVideoNo(row: n, coloumname: "deviceno") == LocaldeviceNo){  //if the return deviceNo = the localdeviceNo Downloadvideo.
+                    print("downloading video for device: ",returnVideoNo(row: n, coloumname: "deviceno"))
+                    downloadVideos(filename: returnVideoNo(row: n, coloumname: "videoUrl"), storageURL: returnVideoNo(row: n, coloumname: "locDirectory"))
 
-                downloadVideos(filename: returnVideoNo(row: n, coloumname: "videoUrl"))
+
+                }// if statelemt end
+            
                  
-       }//for ends
+       }//for ends, (video database for statement)
+        loadvideosScreen()
+    }//if database is not empty statement ends
   
     
 }
 
 
+func deleteVideos(filename : String){ //delete filename in userdocument directory
+
+    print("deleting Vids:" + filename)
+    let fileManager = FileManager.default
+    let documentsUrl =  FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first! as NSURL
+        let documentsPath = documentsUrl.path
+    do{
+        try fileManager.removeItem(at: findlocalDir(filename: filename))
+    } catch {
+        print("Could not delete file:" + filename + "\(error)")
+           }
+    
 }
-func loadvideosScreen(){ //loads array into screen for refresh
+
+func loadvideosScreen(){ //loads array into screen for refresh [videoList] array
+    print("loading videos to screen...")
+    
     if(showvideoDatabase()==true){ // if database is not empty
         videoList.removeAll()
           print("adding video database to screen")
-          for n in 1 ... getTableSize(tablename: "videos") {
-              print("tablesize", n)
-
-              videoList.append(videoAttributes.init(videoname: returnVideoNo(row: n, coloumname: "videono"), description:returnVideoNo(row: n, coloumname: "videoname"),videoNo:returnVideoNo(row: n, coloumname: "videono") ,Url: returnVideoNo(row: n, coloumname: "videoUrl"))
+          for n in 1 ... getTableSize(tablename: "videos") { //for condition to loop through video database
+            if(returnVideoNo(row: n, coloumname: "deviceno")==LocaldeviceNo){ //compares each and if deviceNo = loaldeviceNo , append database daa onto videoList array to display.
+                
+              videoList.append(videoAttributes.init(videoname: returnVideoNo(row: n, coloumname: "videoname"), description:returnVideoNo(row: n, coloumname: "description"),videoNo:returnVideoNo(row: n, coloumname: "videono") ,Url: returnVideoNo(row: n, coloumname: "videoUrl"))
+                
+        
               )
-    }//for ends
+                
+                    }// if statement ends
+    }//for condition ends/ loops through video database
               
-          }
+          }//if database is not empty condition ends
     
     
 }
+var videodesc = "VideoDatabase Retrieved Successfully"
 
 struct Videos: View {
+    @Binding var displayVideoList: [videoAttributes]
     
-    @Binding var allowRefresh: Bool
+    @State var allowRefresh: Bool = false
     @State var refreshCount = 0
     @State var refreshIcon: String = "rays"
+    let monitor = NWPathMonitor()
+    @State private var showAlert = false
+    
     
     var body: some View {
+        //loadvideosScreen()
+        VStack {
+
+            List(displayVideoList, id: \.videoname) { videoAttributes in
+
+                NavigationLink(destination: VideoView(link:  findlocalDir(filename: videoAttributes.Url).absoluteString) ) {
+                                   
+                    Text( videoAttributes.videoname + " \nVideo: " + videoAttributes.videoNo)
+                                     
+                }.navigationBarTitle(Text("Videos")).navigationBarItems(
+                 trailing: Button(action: {
+                         let queue = DispatchQueue(label: "Monitor")
+                         self.monitor.start(queue: queue)
+                         
+                         self.monitor.pathUpdateHandler = { path in
+                         if path.status == .satisfied {
+                            self.showAlert = false
+                            DispatchQueue.global().async(execute: {
+                                DispatchQueue.main.sync {
+                                    SyncVideoDatabase()
+                                }
+                                self.displayVideoList = self.UpdateList()
+                            })
+                             print("We're connected!")
+                         } else {
+                             self.showAlert = true
+                             print("No connection.")
+                         }
+
+                         print(path.isExpensive)
+                     }
+                     }) {
+                         Text("Sync Videos")
+                         Image(systemName: "rays")
+                     }
+                     .alert(isPresented:self.$showAlert) {
+                         Alert(title: Text("Alert!")
+                         .foregroundColor(Color.red), message: Text("Please connect to the internet to sync videos.")
+                         .foregroundColor(Color.red), dismissButton: .default(Text("Ok")))
+                    })
+                 Text("View Video")
+        
+                
+            }// End List
+            // Debug test for refresh, if changes in sim, refresh works.
+            Text(videodesc)
+        }// End VStack
+    }
+    
+    func UpdateList() -> [videoAttributes]{
         loadvideosScreen()
-        return Group {
-            if(allowRefresh && refreshCount == 1) {
-                Videos(allowRefresh: $allowRefresh)
+        return videoList
+    }
+}
+
+struct refresh: View {
+    
+    @Binding var allowRefresh: Bool
+    @Binding var refreshCount: Int
+    @Binding var refreshIcon: String
+    
+    var body: some View {
+        Button(action: {
+            print("Syncing video database from server...")
+            SyncVideoDatabase() //sync server database files
+            addvideos()
+            if(self.allowRefresh == false) {
+                self.allowRefresh = true
+                self.refreshCount = 1
             }
             else {
-                VStack {
-                    refresh(allowRefresh: $allowRefresh, refreshCount: $refreshCount, refreshIcon: $refreshIcon)
-                    // add content below refresh
-
-                        
-                    List(videoList, id: \.videoNo) { videoAttributes in
-
-                        NavigationLink(destination: VideoView(link:  findlocalDir(filename: videoAttributes.Url).absoluteString) ) {
-                                           
-                          Text( videoAttributes.videoname)
-                          Text( videoAttributes.description)
-                                             
-                         }.navigationBarTitle(Text("Videos")).navigationBarItems(
-                         trailing: Button(action: addvideos, label: { Text("SyncVideos") }))//navlink
-                         Text("View Video")
-                
-                        
-                    }// End List
-                    // Debug test for refresh, if changes in sim, refresh works.
-                    Text("Debug " + String(allowRefresh))
-                }// End VStack
+                self.allowRefresh = false
+                self.refreshCount = 0
             }
-        }// End Group
+        }) {
+            HStack {
+                Text("Download videos")
+               // Image(systemName: refreshIcon)
+            }
+        }
     }
 }
 
@@ -188,123 +383,173 @@ enum ActiveAlert {
 struct UserManagement: View {
     @Binding var currentUser: String
     @Binding var users: [UserDBManager.userAttr]
+    @Binding var newUsersUploaded: Bool
     
-    @State private var width: CGFloat? = 250.0
+    @State private var width: CGFloat? = nil
     @State var showAddView: Bool = false
     @State private var showAlert = false
     @State private var activeAlert: ActiveAlert = .first
+    @State private var showSyncAlert = false
     let monitor = NWPathMonitor()
     
     var body: some View {
-        VStack {
-            VStack{
-                HStack {
-                    NavigationLink(destination: ShowAddView(users: self.$users)) {
-                            HStack(alignment: .firstTextBaseline) {
-                                Text("Add User")
-                                Image(systemName: "person.crop.circle.badge.plus")
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                            }
-                    }
-                    Spacer()
-                }.padding(.leading)
-            }
-            Rectangle()
-                .frame(height: 5)
-                .foregroundColor(Color(red: 238.0/255.0, green: 238.0/255.0, blue: 238.0/255.0, opacity: 1.0))
-            List(users, id: \.username) { users in
-                Text(users.username)
-                    .frame(width: self.width, alignment: .leading)
-                    .lineLimit(1)
-                    .background(CenteringView())
-                Spacer()
-                Text(users.password)
-                    .frame(width: self.width, alignment: .leading)
-                    .lineLimit(1)
-                    .background(CenteringView())
-                Spacer()
-                if(users.username != "Username") {
-                    Button(action: {
-                        if(users.username == self.currentUser) {
-                            self.activeAlert = .first
-                        } else {
-                            if(users.location == "Offline") {
-                                print("loc: " + users.location)
-                                self.activeAlert = .second
-                            }
-                            else if(users.location == "Online"){
-                                let queue = DispatchQueue(label: "Monitor")
-                                self.monitor.start(queue: queue)
-                                
-                                self.monitor.pathUpdateHandler = { path in
-                                if path.status == .satisfied {
-                                    print("We're connected!")
-                                    print("stat: " + users.location)
-                                    self.activeAlert = .third
-                                } else {
-                                    print("No connection.")
-                                    self.activeAlert = .fourth
+            VStack {
+                VStack{
+                    HStack {
+                        NavigationLink(destination: ShowAddView(users: self.$users, newUsersUploaded: $newUsersUploaded)) {
+                                HStack(alignment: .firstTextBaseline) {
+                                    Text("Add User")
+                                    Image(systemName: "person.crop.circle.badge.plus")
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
                                 }
-
-                                print(path.isExpensive)
-                                }
-                            }
                         }
-                        self.showAlert = true
-                    }) {
-                        Image(systemName: "person.crop.circle.badge.minus")
-                            .foregroundColor(Color.red)
-                            .font(.title)
-                    }
-                    .alert(isPresented:self.$showAlert) {
-                        switch self.activeAlert {
-                            case .first:
-                                return Alert(title: Text("Alert!")
-                                        .foregroundColor(Color.red), message: Text("You cannot delete yourself.")
-                                        .foregroundColor(Color.red), dismissButton: .default(Text("Ok")))
-                            case .second:
-                                return Alert(title: Text("Alert!")
-                                    .foregroundColor(Color.red), message: Text("Are you sure you want to delete " + users.username)
-                                    .foregroundColor(Color.red), primaryButton: .default(Text("Yes")) {
-                                        self.deleteLocalUser(username: users.username)
-                                    }, secondaryButton: .destructive(Text("Cancel")))
-                            case .third:
-                                return Alert(title: Text("Alert!")
-                                    .foregroundColor(Color.red), message: Text("Are you sure you want to delete " + users.username)
-                                    .foregroundColor(Color.red), primaryButton: .default(Text("Yes")) {
-                                        self.deleteOnlineUser(username: users.username, password: users.password)
-                                    }, secondaryButton: .destructive(Text("Cancel")))
-                            case .fourth:
-                                return Alert(title: Text("Alert!")
-                                    .foregroundColor(Color.red), message: Text("Please connect to the internet to delete " + users.username)
-                                    .foregroundColor(Color.red), dismissButton: .default(Text("Ok")))
-                        }//switch
-                    }//alertz
-                }//if
-                else {
-                    Button(action: {}) {
-                        Image(systemName: "person.crop.circle.badge.minus")
-                            .foregroundColor(Color.white)
-                            .font(.title)
-                    }
+                        Spacer()
+                    }.padding(.leading)
                 }
+                Rectangle()
+                    .frame(height: 5)
+                    .foregroundColor(Color(red: 238.0/255.0, green: 238.0/255.0, blue: 238.0/255.0, opacity: 1.0))
+                //users = self.UpdateList()
+                List(users, id: \.username) { users in
+                    if(users.location == "Offline") {
+                        Text(users.username)
+                            .frame(width: self.width, alignment: .leading)
+                            .lineLimit(1)
+                            .background(CenteringView())
+                            .foregroundColor(Color.gray)
+                        Spacer()
+                        Text(users.password)
+                            .frame(width: self.width, alignment: .leading)
+                            .lineLimit(1)
+                            .background(CenteringView())
+                            .foregroundColor(Color.gray)
+                        Spacer()
+                    } else {
+                        Text(users.username)
+                            .frame(width: self.width, alignment: .leading)
+                            .lineLimit(1)
+                            .background(CenteringView())
+                        Spacer()
+                        Text(users.password)
+                            .frame(width: self.width, alignment: .leading)
+                            .lineLimit(1)
+                            .background(CenteringView())
+                        Spacer()
+                    }
+                    if(users.username != "Username") {
+                        Button(action: {
+                            if(users.username == self.currentUser) {
+                                self.activeAlert = .first
+                            } else {
+                                if(users.location == "Offline") {
+                                    print("loc: " + users.location)
+                                    self.activeAlert = .second
+                                }
+                                else if(users.location == "Online"){
+                                    let queue = DispatchQueue(label: "Monitor")
+                                    self.monitor.start(queue: queue)
+                                    
+                                    self.monitor.pathUpdateHandler = { path in
+                                    if path.status == .satisfied {
+                                        print("We're connected!")
+                                        print("stat: " + users.location)
+                                        self.activeAlert = .third
+                                    } else {
+                                        print("No connection.")
+                                        self.activeAlert = .fourth
+                                    }
+
+                                    print(path.isExpensive)
+                                    }
+                                }
+                            }
+                            self.showAlert = true
+                        }) {
+                            Image(systemName: "person.crop.circle.badge.minus")
+                                .foregroundColor(Color.red)
+                                .font(.title)
+                        }
+                        .alert(isPresented:self.$showAlert) {
+                            switch self.activeAlert {
+                                case .first:
+                                    return Alert(title: Text("Alert!")
+                                            .foregroundColor(Color.red), message: Text("You cannot delete yourself.")
+                                            .foregroundColor(Color.red), dismissButton: .default(Text("Ok")))
+                                case .second:
+                                    return Alert(title: Text("Alert!")
+                                        .foregroundColor(Color.red), message: Text("Are you sure you want to delete " + users.username)
+                                        .foregroundColor(Color.red), primaryButton: .default(Text("Yes")) {
+                                            self.deleteLocalUser(username: users.username)
+                                        }, secondaryButton: .destructive(Text("Cancel")))
+                                case .third:
+                                    return Alert(title: Text("Alert!")
+                                        .foregroundColor(Color.red), message: Text("Are you sure you want to delete " + users.username)
+                                        .foregroundColor(Color.red), primaryButton: .default(Text("Yes")) {
+                                            self.deleteOnlineUser(username: String(users.username), password: String(users.password))
+                                        }, secondaryButton: .destructive(Text("Cancel")))
+                                case .fourth:
+                                    return Alert(title: Text("Alert!")
+                                        .foregroundColor(Color.red), message: Text("Please connect to the internet to delete " + users.username)
+                                        .foregroundColor(Color.red), dismissButton: .default(Text("Ok")))
+                            }//switch
+                        }//alertz
+                    }//if
+                    else {
+                        Button(action: {}) {
+                            Image(systemName: "person.crop.circle.badge.minus")
+                                .foregroundColor(Color.white)
+                                .font(.title)
+                        }
+                    }
+                    
+                }
+            }// End VStack
+            .navigationBarTitle(Text("User Management")).navigationBarItems(
+            trailing: Button(action: {
+
+                let queue = DispatchQueue(label: "Monitor")
+                self.monitor.start(queue: queue)
                 
-            }
-        }// End VStack
-        .navigationBarTitle(Text("User Management")).navigationBarItems(
-        trailing: Button(action: {
-            let db = UserDBManager()
-            db.uploadUsers()
-        }) {
-                Text("Sync Users")
-                Image(systemName: "rays")
+                self.monitor.pathUpdateHandler = { path in
+                if path.status == .satisfied {
+                    print("We're connected!")
+                    DispatchQueue.global().async(execute: {
+                        let db = UserDBManager()
+                        DispatchQueue.main.sync {
+                            db.uploadUsers()
+                            
+                        }
+                    self.newUsersUploaded = false
+                    self.users = self.UpdateList()
+                    })
+                } else {
+                    print("No connection.")
+                    self.showSyncAlert = true
+                }
+
+                print(path.isExpensive)
+                }
             })
+                {
+                    Text("Sync Users")
+                    Image(systemName: "rays")
+        })
+        .alert(isPresented:self.$showSyncAlert) {
+            Alert(title: Text("Alert!")
+            .foregroundColor(Color.red), message: Text("Please connect to the internet to sync users.")
+            .foregroundColor(Color.red), dismissButton: .default(Text("Ok")))
+        }
+    }
+    
+    func UpdateList() -> [UserDBManager.userAttr] {
+        return UserDBManager().retrieveUserAttr()
     }
 
     func deleteLocalUser(username: String){
         let localDb = UserDBManager()
         localDb.deleteUser(username: username)
+        self.newUsersUploaded = false
         users = UserDBManager().retrieveUserAttr()
     }
 
@@ -319,6 +564,7 @@ struct UserManagement: View {
 
 struct ShowAddView: View {
     @Binding var users: [UserDBManager.userAttr]
+    @Binding var newUsersUploaded: Bool
     
     @State var username = ""
     @State var password = ""
@@ -417,6 +663,7 @@ struct ShowAddView: View {
             self.username = ""
             self.password = ""
             self.confirmPassword = ""
+            newUsersUploaded = true
         }
     }
 }
@@ -522,31 +769,6 @@ struct CenteringView: View {
     }
 }
 
-struct refresh: View {
-    
-    @Binding var allowRefresh: Bool
-    @Binding var refreshCount: Int
-    @Binding var refreshIcon: String
-    
-    var body: some View {
-        Button(action: {
-            if(self.allowRefresh == false) {
-                self.allowRefresh = true
-                self.refreshCount = 1
-            }
-            else {
-                self.allowRefresh = false
-                self.refreshCount = 0
-            }
-        }) {
-            HStack {
-                Text("Sync")
-                Image(systemName: refreshIcon)
-            }
-        }
-    }
-}
-
 struct VideoGallery_Previews: PreviewProvider {
     static var previews: some View {
         Text("Preview")
@@ -559,11 +781,9 @@ struct VideoGallery_Previews: PreviewProvider {
     }
 }
 
-
-//video download
-let storageURL = "https://pa2001.cdms.westernsydney.edu.au/f/storage/app/public/"
-//this is the directory for video storage
-func downloadVideos (filename : String){
+func downloadVideos (filename : String, storageURL : String){
+    //downloads video from server URL, local videos of same name will be erased beforehand.
+    deleteVideos(filename: filename)
     print("DownloadVideo from:" , storageURL + filename)
           // Create destination URL
            let documentsUrl:URL =  FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first! as URL

@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct SurveyScreen: View {
     
@@ -51,7 +52,6 @@ struct SurveyScreen: View {
 let nations = Bundle.main.decode([Nationalities].self, from: "nationalities.json")
 
 struct Survey: View {
-    //@Environment(\.presentationMode) var presentationMode
     
     @Binding var completed: Bool
     @Binding var login: Bool
@@ -60,158 +60,183 @@ struct Survey: View {
     @State var age = ""
     @State var errMessage = ""
     
-    //let nation = NationalityDBManager().retrieveNation()
-    @State var selectedNation = 0
+    @State var selectedNation = 9
+    @State var nationalityVisible = false
     
     let gender = ["Male", "Female", "Other"]
-    @State var selectedGender = 0
+    @State var selectedGender = 1
+    @State var genderVisible = false
+    
+    @State var nationalityTextPosX = 350
+    @State var nationalityTextPosY = 360
+    @State var nationalityPosX = 650
+    @State var nationalityPosY = 360
     
     var body: some View {
-        
-        VStack {
-            HStack {
-                Button(action: {
-                    if (self.goBack == false) {
-                        self.goBack = true
-                    }
-                }) {
+        ZStack {
+            
+            Group {
+                Button(action: {self.goBack.toggle()}) {
                     Image(systemName: "chevron.left")
-                    .padding()
-                    .font(.title)
-                    .foregroundColor(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0))
+                        .font(.title)
                 }
-                Spacer()
-                Button(action: {
-                    if (self.login == false) {
-                        self.login = true
-                    }
-                }) {
+                .position(x: 20, y: 20)
+                
+                Button(action: {self.login.toggle()}) {
                     Image(systemName: "person.circle.fill")
-                    .padding()
-                    .font(.title)
+                        .font(.title)
                 }
+                .position(x: 1050, y: 20)
             }
-            Section {
+            
+            Group {
                 Text("Please fill in this short survey to view the exhibition:")
-                    .font(.title)
+                    .font(.custom("Avenirnext-Regular", size: 28))
+                    .position(x: 540, y: 40)
+                
                 Text(errMessage)
                     .foregroundColor(Color.red)
+                    .position(x: 540, y: 80)
             }
-            Spacer()
-            VStack(alignment: .center) {
-                Section {
-                    HStack {
-                        Text("Enter Your Age : ")
-                            .font(.headline)
-                            .offset(x: 25)
-                        TextField("19, 20, 26..", text: self.$age)
-                            .padding()
-                            .frame(width: 350, height: 50)
-                            .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
-                            .cornerRadius(25)
-                            .offset(x: 35)
-                    }
-                }
-                .padding()
-                Section {
-                    HStack {
-                        Spacer()
-                        Text("Select Your Gender : ")
-                            .font(.headline)
-                            .offset(x: 10)
-                        Picker(selection: $selectedGender, label: Text("")) {
-                            ForEach(0 ..< gender.count) {
-                                Text(self.gender[$0])
+            
 
-                            }
+            Group {
+                Text("Enter Your Age : ")
+                    .font(.custom("Avenirnext-Regular", size: 20))
+                    .position(x: 350, y: 200)
+                TextField("19, 20, 26..", text: self.$age)
+                    .frame(width: 350, height: 45)
+                    .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                    .cornerRadius(25)
+                    .keyboardType(.numberPad)
+                    .onReceive(Just(age)) { newValue in
+                        let filtered = newValue.filter { "0123456789".contains($0)}
+                        if filtered != newValue {
+                            self.age = filtered
+                        }                }
+                    .onTapGesture {
+                        if self.nationalityVisible {
+                            self.nationalityVisible.toggle()
                         }
-                        .padding()
-                        .labelsHidden()
-                        .frame(height: 45)
-                        .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
-                        .cornerRadius(25)
-                        .offset(x: 15)
-                        Spacer()
-                    }
-                }
-                .padding()
-                Section {
-                    HStack {
-                        Spacer()
-                        Text("Select Your Nationality : ")
-                            .font(.headline)
-                        Picker(selection: $selectedNation, label: Text("")) {
-                            /*ForEach(0 ..< nation.count) {
-                                Text(self.nation[$0])
-
-                            }*/
-                            ForEach(0 ..< nations.count) {
-                                Text(nations[$0].name)
-
-                            }
+                        if self.genderVisible {
+                            self.genderVisible.toggle()
+                            self.nationalityTextPosY = 360
+                            self.nationalityPosY = 360
                         }
-                        .padding()
-                        .labelsHidden()
-                        .frame(height: 45)
-                        .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
-                        .cornerRadius(25)
-                        Spacer()
+
                     }
-                }
-                .padding()
+                    .multilineTextAlignment(.center)
+                    .position(x: 650, y: 200)
             }
-            Spacer()
-            Section {
-                HStack {
-                    Button(action: {
-                        self.age = ""
-                        self.selectedGender = 0
-                        self.selectedNation = 0
-                    }) {
-                        Text("Clear")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                            .padding()
-                            .fixedSize()
-                            .frame(width: 140, height: 45)
-                            .foregroundColor(.white)
-                            .background(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0))
-                            .cornerRadius(8)
-                        
-                    }// End Button
-                    .padding()
-                    Button(action: {
-                        if(self.age.isEmpty) {
-                            self.errMessage = "Please fill in all the fields."
+            
+            
+            Group {
+                Text("Select Your Gender : ")
+                    .font(.custom("Avenirnext-Regular", size: 20))
+                    .position(x: 350, y: 280)
+                if genderVisible {
+                    Picker(selection: $selectedGender, label: Text("")) {
+                        ForEach(0 ..< gender.count) {
+                            Text(self.gender[$0])
+                                .font(.custom("Avenirnext-Regular", size: 18))
                         }
-                        else {
-                            self.save()
-                            if (self.completed == false) {
-                                self.completed = true
-                                
-                            }
-                        }
-                    }) {
-                        Text("Submit")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                            .padding()
-                            .fixedSize()
-                            .frame(width: 140, height: 45)
-                            .foregroundColor(.white)
-                            .background(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0))
-                            .cornerRadius(8)
-                        
-                    }// End Button
-                    .padding()
-                }//End HStack
+                    }
+                    .onTapGesture { self.genderVisible.toggle() }
+                    .labelsHidden()
+                    .position(x: 650, y: 350)
+                }//if
                 
-                
+                Button(action: {
+                    if self.nationalityVisible {
+                        self.nationalityVisible.toggle()
+                    }
+                    if self.genderVisible {
+                        self.nationalityTextPosY = 360
+                        self.nationalityPosY = 360
+                    }
+                    else {
+                        self.nationalityTextPosY = 440
+                        self.nationalityPosY = 440
+                    }
+                    self.genderVisible.toggle()
+                }) {
+                    Text(self.gender[selectedGender])
+                    .font(.custom("Avenirnext-Regular", size: 18))
+                }
+                .frame(width: 350, height: 45)
+                .foregroundColor(self.genderVisible ? .red : .black)
+                .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                .cornerRadius(25)
+                .position(x: 650, y: 280)
             }
-            Spacer()
+            
+            
+            
+            
+            Group {
+                Text("Select Your Nationality : ")
+                    .font(.custom("Avenirnext-Regular", size: 20))
+                    .position(x: CGFloat(nationalityTextPosX), y: CGFloat(nationalityTextPosY))
+                
+                if nationalityVisible {
+                    Picker(selection: $selectedNation, label: Text("")) {
+                        ForEach(0 ..< nations.count) {
+                            Text(nations[$0].name)
+                                .font(.custom("Avenirnext-Regular", size: 18))
+                        }
+                    }
+                    .onTapGesture { self.nationalityVisible.toggle() }
+                    .labelsHidden()
+                    .cornerRadius(25)
+                    .position(x: 650, y: 430)
+                } //if
+                
+                Button(action: {
+                    if self.genderVisible {
+                        self.genderVisible.toggle()
+                        self.nationalityTextPosY = 360
+                        self.nationalityPosY = 360
+                    }
+                    self.nationalityVisible.toggle()
+                }) {
+                    Text(nations[selectedNation].name)
+                        .font(.custom("Avenirnext-Regular", size: 18))
+                }
+                .frame(width: 350, height: 45)
+                .foregroundColor(self.nationalityVisible ? .red : .black)
+                .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                .cornerRadius(25)
+                .position(x: CGFloat(nationalityPosX), y: CGFloat(nationalityPosY))
+            }
+            
+            Group {
+                Button(action: {
+                    if(self.age.isEmpty) {
+                        self.errMessage = "Please fill in your age."
+                    }
+                    else {
+                        self.save()
+                        if (self.completed == false) {
+                            self.completed = true
+                        }
+                    }
+                }) {
+                    Text("Submit")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .padding()
+                    .fixedSize()
+                    .frame(width: 140, height: 45)
+                    .foregroundColor(.white)
+                    .background(Color(red: 0/255.0, green: 96/255.0, blue: 100/255.0, opacity: 1.0))
+                    .cornerRadius(25)
+                    .shadow(color: .gray, radius: 1, x: 0, y: 3)
+                }
+                .position(x: 540, y: 600)
+            }
         }
-
     }
+    
     func save() {
         let db = SurveyDBManager()
         db.addRow(gender: gender[selectedGender], age: self.age, nationality: nations[selectedNation].name)
