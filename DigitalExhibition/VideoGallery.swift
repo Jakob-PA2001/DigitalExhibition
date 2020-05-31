@@ -29,7 +29,7 @@ struct VideoGallery: View {
                 SplashScreen()
             }
             else {
-                Menu(currentUser: $username, logout: $logout, allowRefresh: $allowRefresh, users: self.$users, selectedDevice: $selectedDevice, taps: $taps, newUsersUploaded: $newUsersUploaded)
+                Menu(currentUser: $username, logout: $logout, allowRefresh: $allowRefresh, users: self.$users, selectedDevice: $selectedDevice, taps: $taps, newUsersUploaded: $newUsersUploaded).statusBar(hidden: true)
             }
         }
     }// End Body
@@ -518,11 +518,10 @@ struct UserManagement: View {
                         let db = UserDBManager()
                         DispatchQueue.main.sync {
                             db.uploadUsers()
-                            
                         }
-                    self.newUsersUploaded = false
-                    self.users = self.UpdateList()
+                        self.users = self.UpdateList()
                     })
+                    self.newUsersUploaded = false
                 } else {
                     print("No connection.")
                     self.showSyncAlert = true

@@ -141,7 +141,11 @@ struct Survey: View {
                                 .font(.custom("Avenirnext-Regular", size: 18))
                         }
                     }
-                    .onTapGesture { self.genderVisible.toggle() }
+                    .onTapGesture {
+                        self.nationalityTextPosY = 360
+                        self.nationalityPosY = 360
+                        self.genderVisible.toggle()
+                    }
                     .labelsHidden()
                     .position(x: 650, y: 350)
                 }//if

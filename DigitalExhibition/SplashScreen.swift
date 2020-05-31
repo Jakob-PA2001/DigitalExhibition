@@ -18,7 +18,6 @@ struct SplashScreen: View {
             if canExplore {
                 //SurveyScreen()
                 //TestScreen()
-                //LogIn()
                 FakeView(pass: $canExplore)
             }
             else {
@@ -54,11 +53,6 @@ struct Welcome: View {
     
     var body: some View {
         ZStack {
-            //ZStack{
-                //Color(red: 66/255.0, green: 142/255.0, blue: 146/255.0, opacity: 1.0)
-            //}
-            
-            
             Group {
                 Image("back")
                     .resizable()
@@ -126,65 +120,6 @@ struct Welcome: View {
                 .position(x: 300, y: 757)
             
         }// ZStack
-        /*VStack {
-            VStack {
-                /*HStack {
-                    Image("fire.logo")
-                        .font(.subheadline)
-                        .padding()
-                    Spacer()
-                    Image("wsu.logo")
-                        .font(.subheadline)
-                        .padding()
-                }*/
-                ZStack {
-                    Color(red: 66/255.0, green: 142/255.0, blue: 146/255.0, opacity: 1.0)
-                    HStack {
-                        Image("frontpage")
-                        .resizable()
-                        .frame(width: 1000, height: 611)
-                        .aspectRatio(contentMode: .fit)
-                        .position(x: UIScreen.main.bounds.width/2, y: UIScreen.main.bounds.height/2)
-                    }
-                    VStack {
-                        Button(action: {
-                            let queue = DispatchQueue(label: "Monitor")
-                            self.monitor.start(queue: queue)
-                            
-                            self.monitor.pathUpdateHandler = { path in
-                            if path.status == .satisfied {
-                                print("We're connected!")
-                                DispatchQueue.global().async(execute: {
-                                    DispatchQueue.main.sync {
-                                        UserDBManager().DeleteAll()
-                                    }
-                                    OnlineUserDB().DownloadUsers()
-                                })
-                            } else {
-                                print("No connection.")
-                            }
-
-                            print(path.isExpensive)
-                        }
-                            if(self.canExplore == false) {
-                                self.canExplore = true
-                            }
-                        }) {
-                                Text("Enter")
-                                    .font(.custom("Papyrus", size: 48))
-                                    .padding()
-                                    .fixedSize()
-                                    .frame(width: 180, height: 110)
-                                    .foregroundColor(.black)
-                                    .background(Color(red: 241/255.0, green: 248/255.0, blue: 233/255.0, opacity: 1.0))
-                                    .cornerRadius(8)
-                            
-                        }
-                    }
-                    .position(x: 265, y: 590)
-                }
-            }
-        }//VStack */
     }
 }
 
